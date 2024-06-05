@@ -59,7 +59,7 @@ export default class LandingPage extends React.Component {
         };
 
         return (
-            <div style={{paddingTop: '20px', paddingLeft: '250px', maxWidth: '1200px'}}>
+            <div style={{paddingTop: '25px', paddingLeft: '95px', maxWidth: '1400px'}}>
                 <h2 style={{color: '#2563c0'}}>AI Image Generator</h2>
 
                 <Box sx={{display: 'flex', width: '100%'}}>
@@ -76,8 +76,9 @@ export default class LandingPage extends React.Component {
                                    size='medium'/>
                     </Box>
                     <Box sx={{flex: '1', paddingLeft: '50px'}}>
-                        <label>Number of images to generate</label>
-                        <Slider defaultValue={1}
+                        <label htmlFor={'num-images-slider'}>Number of images to generate</label>
+                        <Slider id='num-images-slider'
+                                defaultValue={1}
                                 min={1}
                                 max={3}
                                 marks={marks}
@@ -103,7 +104,8 @@ export default class LandingPage extends React.Component {
                             }}
                             parentCallback={this.setIsDisabled}/>}
                 </div>
-            </div>)
+            </div>
+        )
     }
 }
 

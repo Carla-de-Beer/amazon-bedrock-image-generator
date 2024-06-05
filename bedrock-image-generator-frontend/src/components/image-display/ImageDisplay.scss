@@ -1,14 +1,4 @@
-@mixin image-box-styles {
+.image-box-1 {
   max-height: 480px;
   position: relative;
-}
-
-.image-box-1 {
-  @include image-box-styles;
-  margin-top: 10px;
-}
-
-.image-box-n {
-  @include image-box-styles;
-  margin-top: 15px;
 }

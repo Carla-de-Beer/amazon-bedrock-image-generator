@@ -1,24 +1,98 @@
 import React from 'react';
-import {CircularProgress} from '@mui/material';
+import {
+    Box,
+    CircularProgress,
+    FormControl,
+    FormControlLabel,
+    FormLabel, ImageList, ImageListItem,
+    Radio,
+    RadioGroup,
+    Typography
+} from '@mui/material';
 import axios, {AxiosResponse} from 'axios';
 import {ImageParameters} from '../../types/complexTypes';
 import './ImageDisplay.scss';
+import Modal from '@mui/material/Modal';
+import Button from '@mui/material/Button';
+import html2canvas from 'html2canvas';
 
 export default class ImageDisplay extends React.Component<{
     parameters: ImageParameters,
     parentCallback(isDisabled: boolean): void
 }> {
 
+    constructor(props: any) {
+        super(props);
+        this.injectHtml2canvas();
+    }
+
     state = {
         imageUrls: [],
         isDone: false,
-        isLoading: true
+        isLoading: true,
+        isOpen: false,
+        fileFormat: 'jpeg',
+        currentImage: ''
     };
 
     quotes: string[] = [
         'Anytime someone tells me that I can\'t do something, I want to do it more.',
         'If you are lucky enough to find something that you love, and you have a shot at being good at it, don\'t stop, don\'t put it down.'
     ];
+
+    setOpen = (isOpen: boolean): void => {
+        this.setState({
+            isOpen: isOpen
+        });
+    };
+
+    setFileFormat = (fileFormat: string): void => {
+        this.setState({
+            fileFormat: fileFormat
+        });
+    };
+
+    setCurrentImage = (currentImage: string): void => {
+        this.setState({
+            currentImage: currentImage
+        });
+    };
+
+    handleClose = () => this.setOpen(false);
+
+    handleRadioChange = (event: any): void => {
+        this.setFileFormat(event.target.value);
+    };
+
+    injectScript = (uri: string): void => {
+        const document: Document = window.document;
+        const script: HTMLScriptElement = document.createElement('script');
+        script.setAttribute('src', uri);
+        document.body.appendChild(script);
+    };
+
+    injectHtml2canvas = (): void => {
+        this.injectScript('//html2canvas.hertzen.com/dist/html2canvas.js');
+    };
+
+    saveScreenshot = (canvas: any): void => {
+        const fileName: string = 'image';
+        const link: HTMLAnchorElement = document.createElement('a');
+        link.download = fileName + '.' + this.state.fileFormat;
+        canvas.toBlob((blob: any): void => {
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        });
+    };
+
+    downloadImage = async (): Promise<void> => {
+        this.setOpen(false);
+        const canvas: HTMLCanvasElement = await html2canvas(document.querySelector(this.state.currentImage) as HTMLElement, {
+            allowTaint: true,
+            useCORS: true
+        });
+        return this.saveScreenshot(canvas);
+    };
 
     componentDidMount(): void {
         this.props.parentCallback(true);
@@ -28,22 +102,23 @@ export default class ImageDisplay extends React.Component<{
             numberOfImages: this.props.parameters.numberOfImages
         }, {
             responseType: 'arraybuffer',
-        }).then(response => {
+        }).then((response: AxiosResponse<any, any>) => {
                 const s3Requests: Promise<AxiosResponse<any>>[] = [];
 
                 const presignedUrls: string[] = JSON.parse(new TextDecoder().decode(response.data));
-                for (let i: number = 0; i < presignedUrls.length; ++i) {
-                    const request = axios.get(presignedUrls[i], {responseType: 'arraybuffer'});
+
+                for (const presignedUrl of presignedUrls) {
+                    const request = axios.get(presignedUrl, {responseType: 'arraybuffer'});
                     s3Requests.push(request);
                 }
 
                 axios.all(s3Requests)
-                    .then(axios.spread((...responses): void => {
+                    .then(axios.spread((...responses: AxiosResponse<any, any>[]): void => {
                         const imageUrls: string[] = [];
 
-                        for (let i: number = 0; i < responses.length; ++i) {
-                            let base64ImageString: string = btoa(new Uint8Array(responses[i].data)
-                                .reduce((data, byte) => data + String.fromCharCode(byte), ''));
+                        for (const response of responses) {
+                            let base64ImageString: string = btoa(new Uint8Array(response.data)
+                                .reduce((data: string, byte: number) => data + String.fromCharCode(byte), ''));
 
                             const imageUrl: string = 'data:image/PNG;base64,' + base64ImageString.trim();
                             imageUrls.push(imageUrl);
@@ -72,37 +147,93 @@ export default class ImageDisplay extends React.Component<{
 
     render(): React.JSX.Element {
         return (
-            <div>
+            <>
                 <br/>
-                {!this.state.isDone &&
-                    <div style={{
-                        fontStyle: 'italic',
-                        color: '#646464',
-                        fontFamily: 'sans-serif'
-                    }}>
-                        <p>
+                <div>
+                    {!this.state.isDone &&
+                        <div style={{
+                            fontStyle: 'italic',
+                            color: '#646464',
+                            fontFamily: 'sans-serif'
+                        }}>
+                            <p>
                             <span style={{
                                 fontSize: '20px',
                                 fontWeight: 'bolder'
                             }}>
                                 {this.quotes[this.getRandomInt()]}
                             </span>
-                        </p>
-                        <p style={{
-                            fontSize: '14px',
-                            fontWeight: 'normal'
-                        }}>
-                            Taylor Swift
-                        </p>
-                        <br/>
-                    </div>}
-                {!this.state.isDone && <CircularProgress/>}
-                {this.state.imageUrls?.length > 0 && this.state.imageUrls.map((url: string, index: number) => (
-                    <img src={url}
-                         alt='Base64 Image'
-                         key={index}
-                         className={index === 0 ? 'image-box-1 ' : 'image-box-n'}/>
-                ))}
-            </div>)
+                            </p>
+                            <p style={{
+                                fontSize: '14px',
+                                fontWeight: 'normal'
+                            }}>
+                                Taylor Swift
+                            </p>
+                            <br/>
+                        </div>}
+                    {!this.state.isDone && <CircularProgress/>}
+                    {this.state.imageUrls?.length > 0 &&
+                        <ImageList sx={{width: 1650, height: 480, paddingLeft: -8}} cols={2} rowHeight={500}>
+                            {this.state.imageUrls.map((url: string, index: number) => (
+                                <ImageListItem key={url}>
+                                    <Button key={url}
+                                            onClick={() => {
+                                                this.setCurrentImage(`#image-${index}`);
+                                                this.setOpen(true);
+                                            }}
+                                            className={'image-box-1'}
+                                            style={{border: 'none', background: 'none', padding: 0}}>
+                                        <img src={url}
+                                             id={'image-' + index}
+                                             alt='Base64 Image'
+                                             className={'image-box-1'}
+                                        />
+                                    </Button>
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                    }
+                </div>
+                <Modal
+                    open={this.state.isOpen}
+                    onClose={this.handleClose}
+                    aria-labelledby='modal-modal-title'
+                    aria-describedby='modal-modal-description'>
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 700,
+                        bgcolor: 'background.paper',
+                        border: '1px solid #2563c0',
+                        boxShadow: 24,
+                        p: 4
+                    }}>
+                        <Typography id='modal-modal-title' variant='h6' component='h2'>
+                            Download Options
+                        </Typography>
+                        <br/><br/>
+                        <FormControl>
+                            <FormLabel id='demo-radio-buttons-group-label'>File Format</FormLabel>
+                            <RadioGroup aria-labelledby='demo-radio-buttons-group-label'
+                                        defaultValue='jpeg'
+                                        name='radio-buttons-group'
+                                        onChange={this.handleRadioChange}>
+                                <FormControlLabel value='jpeg' control={<Radio/>} label='jpeg'/>
+                                <FormControlLabel value='png' control={<Radio/>} label='png'/>
+                                <FormControlLabel value='tiff' control={<Radio/>} label='tiff'/>
+                            </RadioGroup>
+                        </FormControl>
+                        <br/><br/><br/>
+                        <Typography id='modal-modal-description' sx={{mt: 2}}>
+                            <Button variant='contained'
+                                    onClick={this.downloadImage}>Download Image</Button>
+                        </Typography>
+                    </Box>
+                </Modal>
+            </>
+        )
     }
 }
