@@ -61,7 +61,6 @@ def lambda_handler(event, context):
         presigned_urls = []
 
         for i in range(number_of_images):
-
             response_base64 = response_bytes['images'][i]
             response_image = base64.b64decode(response_base64)
 
