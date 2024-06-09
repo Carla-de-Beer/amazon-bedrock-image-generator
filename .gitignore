@@ -1,126 +1,41 @@
-######################
-# Project Specific
-######################
-build
-/build/www/**
-/src/test/javascript/coverage/
-/src/test/javascript/PhantomJS*/
-
-######################
-# Node
-######################
-/node/
-/node_tmp/
-**/node_modules/
-npm-debug.log.*
-
-######################
-# SASS
-######################
-.sass-cache/
-
-######################
-# Eclipse
-######################
-*.pydevproject
-.project
-.metadata
-tmp/
-tmp/**/*
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
-.factorypath
-/src/main/resources/rebel.xml
-
-# External tool builders
-.externalToolBuilders/**
-
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-# CDT-specific
-.cproject
-
-# PDT-specific
-.buildpath
-
-######################
-# Intellij
-######################
-.idea/
-*.iml
-*.iws
-*.ipr
-*.ids
-*.orig
-
-######################
-# Visual Studio Code
-######################
-.vscode/
-
-######################
-# Maven
-######################
-/log/
-/target/
-
-######################
-# Package Files
-######################
-*.jar
-*.war
-*.ear
-*.db
-
-######################
-# Windows
-######################
-# Windows image file caches
-Thumbs.db
-
-# Folder config file
-Desktop.ini
-
-######################
-# Mac OSX
-######################
 .DS_Store
-.svn
+.idea
+*.iml
 
-# Thumbnails
-._*
+# Local .terraform directories
+**/.terraform/*
 
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
+# .tfstate files
+*.tfstate
+*.tfstate.*
 
-######################
-# Directories
-######################
-/bin/
-/deploy/
+# Crash log files
+crash.log
+crash.*.log
 
-######################
-# Logs
-######################
-*.log
+# Exclude all .tfvars files, which are likely to contain sensitive data, such as
+# password, private keys, and other secrets. These should not be part of version
+# control as they are data points which are potentially sensitive and subject
+# to change depending on the environment.
+*.tfvars
+*.tfvars.json
 
-######################
-# Others
-######################
-*.class
-*.*~
-*~
-.merge_file*
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
-######################
-# ESLint
-######################
-.eslintcache
+# Ignore transient lock info files created by terraform apply
+.terraform.tfstate.lock.info
+
+# Include override files you do wish to add to version control using negated pattern
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+# example: *tfplan*
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc

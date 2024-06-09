@@ -19,5 +19,5 @@ Image generator app that generates a GenAI image via Amazon Bedrock based on a t
 * `Access-Control-Allow-Headers`
 * `Access-Control-Allow-Methods`
 * `Access-Control-Allow-Origin`
-2. Add the headers to the API Gateway Method Response with the corresponsing values.
+2. Add the headers to the API Gateway Method Response with the corresponding values.
 3. Enable CORS on the Gateway. The `OPTIONS` method will be automatically created.
