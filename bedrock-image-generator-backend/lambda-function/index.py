@@ -31,9 +31,17 @@ def lambda_handler(event, context):
 
     try:
         number_of_images = request_body.get('numberOfImages')
+        landscape_format = request_body.get('landscapeFormat')
 
         if number_of_images is None:
             number_of_images = 1
+
+        width = 768
+        height = 1280
+
+        if landscape_format is True or landscape_format is None:
+            width = 1280
+            height = 768
 
         body = json.dumps(
             {
@@ -44,8 +52,8 @@ def lambda_handler(event, context):
                 'imageGenerationConfig': {
                     'numberOfImages': number_of_images,
                     'quality': 'premium',
-                    'height': 768,
-                    'width': 1280,
+                    'height': height,
+                    'width': width,
                     'cfgScale': 7.5,
                     'seed': 42
                 }
