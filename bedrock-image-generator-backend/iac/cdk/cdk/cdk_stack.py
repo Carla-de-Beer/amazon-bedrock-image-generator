@@ -33,7 +33,7 @@ class CdkStack(Stack):
             runtime=aws_lambda.Runtime.PYTHON_3_12,
             code=aws_lambda.Code.from_asset("../../lambda-function"),
             handler="index.lambda_handler",
-            timeout=Duration.seconds(60),
+            timeout=Duration.seconds(90),
             environment={
                 "IMAGE_STORAGE_BUCKET": images_bucket.bucket_name,
                 "REGION_NAME": "us-east-1"

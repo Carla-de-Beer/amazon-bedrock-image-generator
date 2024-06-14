@@ -54,7 +54,7 @@ def lambda_handler(event, context):
                     'quality': 'premium',
                     'height': height,
                     'width': width,
-                    'cfgScale': 7.5,
+                    'cfgScale': 6.5,
                     'seed': 42
                 }
             }

@@ -1,6 +1,6 @@
 # Amazon Bedrock Image Generator
 
-This project is a React application seamlessly integrated with AWS services, including API Gateway and Lambda. It
+This project consists of a React application seamlessly integrated with AWS services, including API Gateway and Lambda. It
 empowers users to request images through prompts, initiating a process within the Lambda function triggered by API
 Gateway. The application then showcases the requested images within its user interface, offering a dynamic and
 responsive experience.
@@ -16,12 +16,11 @@ Image generator app that generates a GenAI image via Amazon Bedrock based on a t
   bucket,
   before forwarding the presigned URL to API Gateway.
 
-![alt text](architecture/AWS-architecture.png "AWS Architecture")
+![App architecture](images/AWS-architecture.png "AWS Architecture")
 
 ## [Backend code and IaC](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-backend)
 
-The backend consists main of a an AWS Lambda function. This function can be applied directly via either the provided CDK
-Python or Terraform scripts. The Lambda function forwards the request payload to
+The backend consists principally of an AWS Lambda function. The Lambda function forwards the request payload to
 the [Amazon Titan Image Generator G1](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-image.html)
 Bedrock model.
 
@@ -31,19 +30,25 @@ The body of the Lambda function takes the following parameters:
 * `numberOfImages`: number of image variations to be generated (optional, defaults to 1)
 * `landscapeFormat`: true, for landscape format, false for portrait (optional, defaults to landscapeFormat)
 
-Example:
+The following POST request will provide the link to the pre-signed URL:
 
-```json
-{
-  "prompt": "Image of a giraffe standing in Times Square",
-  "numberOfImages": 1,
-  "landscapeFormat": false
-}
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Image of a red cardinal standing on a laptop in an office",
+    "numberOfImages": 2,
+    "landscapeFormat": true
+  }' \
+  https://API-GATEWAY-URL-GOES-HERE
 ```
+
+The Lambda function with basic API Gateway access can be applied directly via either the provided [CDK
+Python or Terraform scripts](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-backend/iac).
 
 ### CORS settings inside AWS API Gateway
 
-The IaC scripts automatically take care of the necessary CORS settings. They can also be manually confirured.
+The IaC scripts automatically take care of the necessary CORS settings. They can also be manually configured.
 
 1. Add the correct headers to the Lambda function:
 
@@ -60,3 +65,8 @@ The IaC scripts automatically take care of the necessary CORS settings. They can
 The frontend consists of a simple React application that provides a GUI to allow for more convenient interaction with the Bedrock
 model. One or more images (up to a maximum of 4) can be created in either landscape or portrait mode, and made available
 for download in one of 3 file format options.
+
+## RockArt UI
+![WordPainter UI](images/ui-image-01.png)
+
+![WordPainter UI](images/ui-image-02.png)

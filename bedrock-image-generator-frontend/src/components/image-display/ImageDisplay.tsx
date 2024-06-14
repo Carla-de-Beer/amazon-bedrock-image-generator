@@ -20,7 +20,8 @@ import html2canvas from 'html2canvas';
 
 export default class ImageDisplay extends React.Component<{
     parameters: ImageParameters,
-    parentCallback(isDisabled: boolean): void
+    parentCallbackIsLoading(isLoading: boolean): void,
+    parentCallbackIsDisabled(isDisabled: boolean): void
 }> {
 
     constructor(props: any) {
@@ -120,7 +121,8 @@ export default class ImageDisplay extends React.Component<{
     };
 
     componentDidMount(): void {
-        this.props.parentCallback(true);
+        this.props.parentCallbackIsDisabled(true);
+        this.props.parentCallbackIsLoading(true);
 
         axios.post('API-GATEWAY-URL-GOES-HERE', {
             prompt: this.props.parameters.prompt,
@@ -159,7 +161,7 @@ export default class ImageDisplay extends React.Component<{
                             filenames: [...filenames]
                         });
 
-                        this.props.parentCallback(false);
+                        this.props.parentCallbackIsLoading(false);
 
                     })).catch(error => {
                     console.log(error)
@@ -184,10 +186,8 @@ export default class ImageDisplay extends React.Component<{
         return (
             <>
                 <br/>
-                <div style={
-                    this.props.parameters.landscapeFormat
-                        ? {marginLeft: '-10px'}
-                        : {marginLeft: '-20px'}}>
+                <div
+                    style={{marginLeft: this.state.isDone && !this.props.parameters.landscapeFormat ? '-30px' : '-10px'}}>
                     {!this.state.isDone &&
                         <div style={{
                             fontStyle: 'italic',
@@ -216,8 +216,8 @@ export default class ImageDisplay extends React.Component<{
                             sx={
                                 this.props.parameters.landscapeFormat
                                     ? {width: 1650, height: 525, paddingLeft: -8}
-                                    : {width: 600, height: 1200, paddingLeft: -8}}
-                            cols={2}
+                                    : {width: 1400, height: 1200, paddingLeft: -25}}
+                            cols={this.props.parameters.landscapeFormat ? 2 : 3}
                             rowHeight={500}>
                             {this.state.imageUrls.map((url: string, index: number) => (
                                 <ImageListItem key={url}>
@@ -228,13 +228,13 @@ export default class ImageDisplay extends React.Component<{
                                             this.setCurrentIndex(index);
                                             this.setOpen(true);
                                         }}
-                                        className={'image-box-1'}
+                                        className={'image-box'}
                                         style={{border: 'none', background: 'none', padding: 0}}>
                                         <img
                                             src={url}
                                             id={'image-' + index}
                                             alt='Base64 Image'
-                                            className={'image-box-1'}
+                                            className={'image-box'}
                                         />
                                     </Button>
                                 </ImageListItem>
@@ -273,14 +273,25 @@ export default class ImageDisplay extends React.Component<{
                                 defaultValue='jpeg'
                                 name='radio-buttons-group'
                                 onChange={this.handleRadioChange}>
-                                <FormControlLabel value='jpeg' control={<Radio/>} label='jpeg'/>
-                                <FormControlLabel value='png' control={<Radio/>} label='png'/>
-                                <FormControlLabel value='tiff' control={<Radio/>} label='tiff'/>
+                                <FormControlLabel
+                                    value='jpeg'
+                                    control={<Radio/>}
+                                    label='jpeg'
+                                />
+                                <FormControlLabel
+                                    value='png'
+                                    control={<Radio/>} label='png'
+                                />
+                                <FormControlLabel
+                                    value='tiff'
+                                    control={<Radio/>} label='tiff'
+                                />
                             </RadioGroup>
                         </FormControl>
                         <br/><br/>
                         <TextField
                             label='Image name'
+                            sx={{width: 200}}
                             defaultValue={this.state.filenames[this.state.currentIndex]}
                             onBlur={e => {
                                 this.setFilename(e.target.value);

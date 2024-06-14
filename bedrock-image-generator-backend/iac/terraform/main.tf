@@ -39,7 +39,7 @@ resource "aws_lambda_function" "images_lambda_tf" {
   function_name = "images_lambda"
   runtime       = "python3.12"
   handler       = "index.lambda_handler"
-  timeout       = 60
+  timeout       = 90
   role          = aws_iam_role.lambda_role.arn
   depends_on    = [aws_iam_role_policy_attachment.lambda_exec_attachment]
 
