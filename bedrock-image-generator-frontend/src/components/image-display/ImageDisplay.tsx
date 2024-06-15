@@ -124,12 +124,12 @@ export default class ImageDisplay extends React.Component<{
         this.props.parentCallbackIsDisabled(true);
         this.props.parentCallbackIsLoading(true);
 
-        axios.post('API-GATEWAY-URL-GOES-HERE', {
+        axios.post('PI-GATEWAY-URL-GOES-HERE', {
             prompt: this.props.parameters.prompt,
             numberOfImages: this.props.parameters.numberOfImages,
             landscapeFormat: this.props.parameters.landscapeFormat
         }, {
-            responseType: 'arraybuffer',
+            responseType: 'arraybuffer'
         }).then((response: AxiosResponse<any, any>): void => {
                 const s3Requests: Promise<AxiosResponse<any>>[] = [];
 
@@ -174,7 +174,7 @@ export default class ImageDisplay extends React.Component<{
 
     extractName(url: string): string {
         const regex = /\/([\d-]+-ai-image)\?/;
-        const match = url.match(regex);
+        const match = regex.exec(url);
         return match ? match[1] : 'ai-image';
     }
 
@@ -232,8 +232,9 @@ export default class ImageDisplay extends React.Component<{
                                         style={{border: 'none', background: 'none', padding: 0}}>
                                         <img
                                             src={url}
+                                            /* tslint:disable comment-format */
+                                            alt=''
                                             id={'image-' + index}
-                                            alt='Base64 Image'
                                             className={'image-box'}
                                         />
                                     </Button>

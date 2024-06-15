@@ -104,11 +104,12 @@ export default class LandingPage extends React.Component {
 
         return (
             <div style={{paddingTop: '25px', paddingLeft: '95px', maxWidth: '1400px'}}>
-                <h2 style={{color: '#2563c0'}}>RockArt</h2>
+                <h2 data-cy='title' style={{color: '#2563c0'}}>RockArt</h2>
 
                 <Box sx={{display: 'flex', width: '100%'}}>
                     <Box>
                         <TextField
+                            data-cy='textfield'
                             label='Image description'
                             sx={{width: 800}}
                             value={this.state.textFieldValue}
@@ -134,6 +135,7 @@ export default class LandingPage extends React.Component {
                         <Box sx={{paddingBottom: '20px', width: '100%'}}>
                             <label htmlFor='num-images-slider'>Number of images to generate</label>
                             <Slider
+                                data-cy='slider'
                                 id='num-images-slider'
                                 value={this.state.sliderValue}
                                 defaultValue={1}
@@ -149,6 +151,7 @@ export default class LandingPage extends React.Component {
                         <FormControl>
                             <FormLabel id='row-radio-buttons-group-label'>Format</FormLabel>
                             <RadioGroup
+                                data-cy='radio-group'
                                 row
                                 aria-labelledby='row-radio-buttons-group-label'
                                 name='row-radio-buttons-group'
@@ -181,6 +184,7 @@ export default class LandingPage extends React.Component {
                 </Box>
                 <br/>
                 <Button
+                    data-cy='generate-button'
                     variant='contained'
                     disabled={this.state.isDisabled}
                     onClick={(): void => {
@@ -188,13 +192,15 @@ export default class LandingPage extends React.Component {
                     }}>
                     Generate with Bedrock
                 </Button>
-                <Button sx={{marginLeft: '20px'}}
-                        variant='outlined'
-                        disabled={this.state.isLoading ? true : !this.state.isDisabled}
-                        onClick={(): void => {
-                            this.setIsDisabled(!this.state.isDisabled);
-                            this.handleClear();
-                        }}>
+                <Button
+                    data-cy='reset-button'
+                    sx={{marginLeft: '20px'}}
+                    variant='outlined'
+                    disabled={this.state.isLoading ? true : !this.state.isDisabled}
+                    onClick={(): void => {
+                        this.setIsDisabled(!this.state.isDisabled);
+                        this.handleClear();
+                    }}>
                     Reset
                 </Button>
                 <div>

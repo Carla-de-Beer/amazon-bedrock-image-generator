@@ -1,4 +1,5 @@
 # Amazon Bedrock Image Generator
+![badge](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/actions/workflows/test-build.yml/badge.svg?event=push)
 
 This project consists of a React application seamlessly integrated with AWS services, including API Gateway and Lambda. It
 empowers users to request images through prompts, initiating a process within the Lambda function triggered by API

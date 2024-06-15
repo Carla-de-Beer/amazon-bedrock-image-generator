@@ -39,3 +39,11 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+######################
+# Node
+######################
+/node/
+/node_tmp/
+**/node_modules/
+npm-debug.log.*

@@ -1,0 +1,34 @@
+describe('Landing Page', () => {
+    it('should render landing page', () => {
+        cy.visit('http://localhost:3000');
+
+        cy.get('[data-cy="title"]')
+            .should('be.visible')
+            .and('have.text', 'RockArt');
+
+        cy.get('[data-cy="textfield"]').should('be.visible');
+
+        cy.get('[data-cy="slider"]')
+            .find('input[value="1"]')
+            .should('be.visible')
+            .and('be.enabled');
+
+        cy.get('[data-cy="radio-group"]')
+            .should('be.visible');
+
+        cy.get('[data-cy="radio-group"]')
+            .find('input[value="landscape"]')
+            .should('be.checked')
+            .and('be.enabled');
+
+        cy.get('[data-cy="generate-button"]')
+            .should('be.visible')
+            .and('have.text', 'Generate with Bedrock')
+            .and('be.enabled');
+
+        cy.get('[data-cy="reset-button"]')
+            .should('be.visible')
+            .and('have.text', 'Reset')
+            .and('be.disabled');
+    })
+});
