@@ -6,7 +6,8 @@ describe('Landing Page', () => {
             .should('be.visible')
             .and('have.text', 'RockArt');
 
-        cy.get('[data-cy="textfield"]').should('be.visible');
+        cy.get('[data-cy="textfield-prompt"]').should('be.visible');
+        cy.get('[data-cy="textfield-negative-text"]').should('be.visible');
 
         cy.get('[data-cy="slider"]')
             .find('input[value="1"]')
@@ -24,11 +25,18 @@ describe('Landing Page', () => {
         cy.get('[data-cy="generate-button"]')
             .should('be.visible')
             .and('have.text', 'Generate with Bedrock')
-            .and('be.enabled');
+            .and('be.disabled');
 
         cy.get('[data-cy="reset-button"]')
             .should('be.visible')
             .and('have.text', 'Reset')
             .and('be.disabled');
+
+        cy.get('[data-cy="textfield-prompt"]').type('some text');
+        cy.get('[data-cy="title"]').click();
+
+        cy.get('[data-cy="generate-button"]')
+            .should('be.enabled');
+
     })
 });

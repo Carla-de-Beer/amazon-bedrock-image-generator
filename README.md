@@ -68,6 +68,9 @@ model. One or more images (up to a maximum of 4) can be created in either landsc
 for download in one of 3 file format options.
 
 ## RockArt UI
+
+The app was built and tested with Google Chrome only.
+
 ![WordPainter UI](images/ui-image-01.png)
 
 ![WordPainter UI](images/ui-image-02.png)

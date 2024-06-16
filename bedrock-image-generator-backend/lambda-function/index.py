@@ -30,6 +30,20 @@ def lambda_handler(event, context):
         }
 
     try:
+        negative_text = request_body.get('negativeText')
+
+        text_to_image_params = {}
+
+        if negative_text is None or negative_text.strip() == '':
+            text_to_image_params = {
+                'text': prompt
+            }
+        else:
+            text_to_image_params = {
+                'text': prompt,
+                'negativeText': negative_text
+            }
+
         number_of_images = request_body.get('numberOfImages')
         landscape_format = request_body.get('landscapeFormat')
 
@@ -46,19 +60,18 @@ def lambda_handler(event, context):
         body = json.dumps(
             {
                 'taskType': 'TEXT_IMAGE',
-                'textToImageParams': {
-                    'text': prompt
-                },
+                'textToImageParams': text_to_image_params,
                 'imageGenerationConfig': {
                     'numberOfImages': number_of_images,
-                    'quality': 'premium',
+                    'quality': 'standard',
                     'height': height,
                     'width': width,
-                    'cfgScale': 6.5,
-                    'seed': 42
+                    'cfgScale': 6.5
                 }
             }
         )
+
+        logger.info('Model payload:', body)
 
         response = client_bedrock.invoke_model(
             body=body,
@@ -66,15 +79,23 @@ def lambda_handler(event, context):
             accept='application/json',
             contentType='application/json')
 
+        logger.info('Model response:', response)
+
         response_bytes = json.loads(response['body'].read())
 
+    except Exception as e:
+        logger.error(f"Could not invoke the Titan Image Generator Model: {e}.")
+        raise
+
+    try:
+        image_array = response_bytes['images']
         presigned_urls = []
 
-        for i in range(number_of_images):
-            response_base64 = response_bytes['images'][i]
+        for i in range(len(image_array)):
+            response_base64 = image_array[i]
             response_image = base64.b64decode(response_base64)
 
-            image_name = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M') + '-' + str(i) + '-ai-image'
+            image_name = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M-%S') + '-' + str(i) + '-ai-image'
 
             client_s3.put_object(
                 Bucket=IMAGE_STORAGE_BUCKET,
@@ -86,8 +107,6 @@ def lambda_handler(event, context):
                 Params={'Bucket': IMAGE_STORAGE_BUCKET, 'Key': image_name},
                 ExpiresIn=3600
             )
-
-            logger.info(generated_presigned_url)
 
             presigned_urls.append(generated_presigned_url)
 
@@ -102,5 +121,5 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        logger.error(f'Could not invoke the Titan Image Generator Model: {e}.')
+        logger.error(f"Could not generate the pre-signed URLs: {e}.")
         raise

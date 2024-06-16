@@ -1,19 +1,22 @@
 import React from 'react';
 import Button from '@mui/material/Button';
-import {Box, RadioGroup, FormControl, FormLabel, Slider, TextField, FormControlLabel, Radio} from '@mui/material';
+import {Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Slider, TextField} from '@mui/material';
 import ImageDisplay from '../image-display/ImageDisplay';
 import './LandingPage.scss';
+
+const MAX_PROMPT_SIZE_IN_CHARS: number = 512;
 
 export default class LandingPage extends React.Component {
 
     state = {
         prompt: '',
+        negativeText: '',
         numberOfImages: 1,
         landscapeFormat: true,
         isShow: false,
         isDisabled: false,
         isLoading: false,
-        textFieldValue: '',
+        isValidationError: false,
         sliderValue: 1,
         radioValue: 'landscape'
     };
@@ -21,6 +24,12 @@ export default class LandingPage extends React.Component {
     setPrompt(prompt: string): void {
         this.setState({
             prompt: prompt
+        });
+    }
+
+    setNegativeText(negativeText: string): void {
+        this.setState({
+            negativeText: negativeText
         });
     }
 
@@ -54,9 +63,9 @@ export default class LandingPage extends React.Component {
         });
     };
 
-    setTextFieldValue = (textFieldValue: string): void => {
+    setIsValidationError = (isValidationError: boolean): void => {
         this.setState({
-            textFieldValue: textFieldValue
+            isValidationError: isValidationError
         });
     };
 
@@ -73,10 +82,19 @@ export default class LandingPage extends React.Component {
     };
 
     handleClear = (): void => {
-        this.setTextFieldValue('');
+        this.setPrompt('');
+        this.setNegativeText('');
         this.setSliderValue(1);
         this.setRadioValue('landscape');
         this.setIsShow(false);
+    };
+
+    handleInputValidation = (prompt: string): void => {
+        if (prompt.length > MAX_PROMPT_SIZE_IN_CHARS || prompt.trim() === '') {
+            this.setIsValidationError(true);
+        } else {
+            this.setIsValidationError(false);
+        }
     };
 
     render(): React.JSX.Element {
@@ -109,18 +127,40 @@ export default class LandingPage extends React.Component {
                 <Box sx={{display: 'flex', width: '100%'}}>
                     <Box>
                         <TextField
-                            data-cy='textfield'
+                            data-cy='textfield-prompt'
                             label='Image description'
                             sx={{width: 800}}
-                            value={this.state.textFieldValue}
-                            rows={5}
+                            value={this.state.prompt}
+                            placeholder={`A text prompt to generate the image must be <= ${MAX_PROMPT_SIZE_IN_CHARS} characters`}
+                            helperText={this.state.isValidationError ? `Prompt cannot be empty or exceed ${MAX_PROMPT_SIZE_IN_CHARS} characters` : ''}
+                            error={this.state.isValidationError}
+                            rows={3}
                             variant='outlined'
                             disabled={this.state.isDisabled}
                             onBlur={e => {
                                 this.setPrompt(e.target.value);
                                 this.setIsShow(false);
+                                this.handleInputValidation(e.target.value);
                             }}
-                            onChange={(e) => this.setTextFieldValue(e.target.value)}
+                            onChange={(e) => this.setPrompt(e.target.value)}
+                            multiline
+                            required
+                            size='medium'
+                        />
+                        <br/><br/>
+                        <TextField
+                            data-cy='textfield-negative-text'
+                            label='Negative text (optional)'
+                            sx={{width: 800}}
+                            value={this.state.negativeText}
+                            placeholder="Don't use negative words in this prompt field. For example, if you don't want to include mirrors in an image, enter mirrors in this prompt. Don't enter no mirrors."
+                            rows={2}
+                            variant='outlined'
+                            disabled={this.state.isDisabled}
+                            onBlur={e => {
+                                this.setNegativeText(e.target.value);
+                            }}
+                            onChange={(e) => this.setNegativeText(e.target.value)}
                             multiline
                             size='medium'
                         />
@@ -186,7 +226,7 @@ export default class LandingPage extends React.Component {
                 <Button
                     data-cy='generate-button'
                     variant='contained'
-                    disabled={this.state.isDisabled}
+                    disabled={this.state.isDisabled || this.state.prompt.trim() === ''}
                     onClick={(): void => {
                         this.setIsShow(!this.state.isShow);
                     }}>
@@ -203,11 +243,13 @@ export default class LandingPage extends React.Component {
                     }}>
                     Reset
                 </Button>
+                <br/>
                 <div>
                     {this.state.isShow &&
                         <ImageDisplay
                             parameters={{
                                 prompt: this.state.prompt,
+                                negativeText: this.state.negativeText || '',
                                 numberOfImages: this.state.numberOfImages || 1,
                                 landscapeFormat: this.state.landscapeFormat
                             }}

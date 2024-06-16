@@ -8,7 +8,8 @@ import {
     ImageList,
     ImageListItem,
     Radio,
-    RadioGroup, TextField,
+    RadioGroup,
+    TextField,
     Typography
 } from '@mui/material';
 import axios, {AxiosResponse} from 'axios';
@@ -124,10 +125,8 @@ export default class ImageDisplay extends React.Component<{
         this.props.parentCallbackIsDisabled(true);
         this.props.parentCallbackIsLoading(true);
 
-        axios.post('PI-GATEWAY-URL-GOES-HERE', {
-            prompt: this.props.parameters.prompt,
-            numberOfImages: this.props.parameters.numberOfImages,
-            landscapeFormat: this.props.parameters.landscapeFormat
+        axios.post('API-GATEWAY-URL-GOES-HERE', {
+            ...this.props.parameters
         }, {
             responseType: 'arraybuffer'
         }).then((response: AxiosResponse<any, any>): void => {
@@ -164,11 +163,13 @@ export default class ImageDisplay extends React.Component<{
                         this.props.parentCallbackIsLoading(false);
 
                     })).catch(error => {
-                    console.log(error)
+                    console.log(error);
+                    alert(error);
                 });
             }
         ).catch(error => {
             console.error(error);
+            alert(error);
         });
     }
 
@@ -187,12 +188,17 @@ export default class ImageDisplay extends React.Component<{
             <>
                 <br/>
                 <div
-                    style={{marginLeft: this.state.isDone && !this.props.parameters.landscapeFormat ? '-30px' : '-10px'}}>
+                    style={{
+                        marginLeft: this.state.isDone && !this.props.parameters.landscapeFormat
+                            ? `-40px`
+                            : '-10px'
+                    }}>
                     {!this.state.isDone &&
                         <div style={{
                             fontStyle: 'italic',
                             color: '#646464',
-                            fontFamily: 'sans-serif'
+                            fontFamily: 'sans-serif',
+                            marginLeft: '10px'
                         }}>
                             <p>
                             <span style={{
@@ -210,13 +216,13 @@ export default class ImageDisplay extends React.Component<{
                             </p>
                             <br/>
                         </div>}
-                    {!this.state.isDone && <CircularProgress/>}
+                    {!this.state.isDone && <CircularProgress style={{marginLeft: '10px'}}/>}
                     {this.state.imageUrls?.length > 0 &&
                         <ImageList
                             sx={
                                 this.props.parameters.landscapeFormat
                                     ? {width: 1650, height: 525, paddingLeft: -8}
-                                    : {width: 1400, height: 1200, paddingLeft: -25}}
+                                    : {width: 1100, height: 1200, paddingLeft: -30}}
                             cols={this.props.parameters.landscapeFormat ? 2 : 3}
                             rowHeight={500}>
                             {this.state.imageUrls.map((url: string, index: number) => (
@@ -232,7 +238,6 @@ export default class ImageDisplay extends React.Component<{
                                         style={{border: 'none', background: 'none', padding: 0}}>
                                         <img
                                             src={url}
-                                            /* tslint:disable comment-format */
                                             alt=''
                                             id={'image-' + index}
                                             className={'image-box'}
@@ -292,7 +297,7 @@ export default class ImageDisplay extends React.Component<{
                         <br/><br/>
                         <TextField
                             label='Image name'
-                            sx={{width: 200}}
+                            sx={{width: 400}}
                             defaultValue={this.state.filenames[this.state.currentIndex]}
                             onBlur={e => {
                                 this.setFilename(e.target.value);
