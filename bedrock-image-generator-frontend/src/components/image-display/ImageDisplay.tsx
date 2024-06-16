@@ -237,9 +237,9 @@ export default class ImageDisplay extends React.Component<{
                                         className={'image-box'}
                                         style={{border: 'none', background: 'none', padding: 0}}>
                                         <img
+                                            id={'image-' + index}
                                             src={url}
                                             alt=''
-                                            id={'image-' + index}
                                             className={'image-box'}
                                         />
                                     </Button>

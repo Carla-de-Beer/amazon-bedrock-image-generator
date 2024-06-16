@@ -4,6 +4,8 @@ import {Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Slider
 import ImageDisplay from '../image-display/ImageDisplay';
 import './LandingPage.scss';
 
+import logo from '../../assets/hand-blue-logo.png';
+
 const MAX_PROMPT_SIZE_IN_CHARS: number = 512;
 
 export default class LandingPage extends React.Component {
@@ -12,13 +14,12 @@ export default class LandingPage extends React.Component {
         prompt: '',
         negativeText: '',
         numberOfImages: 1,
+        radioValue: 'landscape',
         landscapeFormat: true,
         isShow: false,
         isDisabled: false,
         isLoading: false,
-        isValidationError: false,
-        sliderValue: 1,
-        radioValue: 'landscape'
+        isValidationError: false
     };
 
     setPrompt(prompt: string): void {
@@ -38,6 +39,12 @@ export default class LandingPage extends React.Component {
             numberOfImages: numberOfImages
         });
     }
+
+    setRadioValue = (radioValue: string): void => {
+        this.setState({
+            radioValue: radioValue
+        });
+    };
 
     setLandscapeFormat(landscapeFormat: boolean): void {
         this.setState({
@@ -69,32 +76,24 @@ export default class LandingPage extends React.Component {
         });
     };
 
-    setSliderValue = (sliderValue: number): void => {
-        this.setState({
-            sliderValue: sliderValue
-        });
-    };
-
-    setRadioValue = (radioValue: string): void => {
-        this.setState({
-            radioValue: radioValue
-        });
-    };
-
-    handleClear = (): void => {
-        this.setPrompt('');
-        this.setNegativeText('');
-        this.setSliderValue(1);
-        this.setRadioValue('landscape');
-        this.setIsShow(false);
-    };
-
     handleInputValidation = (prompt: string): void => {
         if (prompt.length > MAX_PROMPT_SIZE_IN_CHARS || prompt.trim() === '') {
             this.setIsValidationError(true);
         } else {
             this.setIsValidationError(false);
         }
+    };
+
+    handleSliderChange = (_: Event, newValue: number | number[]): void => {
+        this.setNumberOfImages(newValue as number);
+    };
+
+    handleReset = (): void => {
+        this.setPrompt('');
+        this.setNegativeText('');
+        this.setNumberOfImages(1);
+        this.setRadioValue('landscape');
+        this.setIsShow(false);
     };
 
     render(): React.JSX.Element {
@@ -113,16 +112,16 @@ export default class LandingPage extends React.Component {
             }
         ];
 
-        const handleChange = (_: Event, newValue: number | number[]): void => {
-            this.setNumberOfImages(newValue as number);
-            this.setIsDisabled(false);
-            this.setIsShow(false);
-            this.setSliderValue(newValue as number);
-        };
-
         return (
-            <div style={{paddingTop: '25px', paddingLeft: '95px', maxWidth: '1400px'}}>
-                <h2 data-cy='title' style={{color: '#2563c0'}}>RockArt</h2>
+            <div style={{paddingTop: '20px', paddingLeft: '95px', maxWidth: '1400px'}}>
+                <div className='header-container'>
+                    <img
+                        src={logo}
+                        alt=''
+                        style={{width: '40px'}}
+                    />
+                    <h2 data-cy='title' style={{color: '#1976d2', marginLeft: '15px'}}>RockArt</h2>
+                </div>
 
                 <Box sx={{display: 'flex', width: '100%'}}>
                     <Box>
@@ -177,15 +176,15 @@ export default class LandingPage extends React.Component {
                             <Slider
                                 data-cy='slider'
                                 id='num-images-slider'
-                                value={this.state.sliderValue}
+                                value={this.state.numberOfImages}
+                                disabled={this.state.isDisabled}
                                 defaultValue={1}
                                 min={1}
                                 max={3}
                                 marks={marks}
                                 aria-label='slider'
-                                disabled={this.state.isDisabled}
                                 style={{width: '100%'}}
-                                onChange={handleChange}
+                                onChange={this.handleSliderChange}
                             />
                         </Box>
                         <FormControl>
@@ -204,7 +203,6 @@ export default class LandingPage extends React.Component {
                                         this.setLandscapeFormat(false);
                                     }
                                     this.setRadioValue(e.target.value);
-                                    this.setIsShow(false);
                                 }}>
                                 <FormControlLabel
                                     value='landscape'
@@ -238,8 +236,8 @@ export default class LandingPage extends React.Component {
                     variant='outlined'
                     disabled={this.state.isLoading ? true : !this.state.isDisabled}
                     onClick={(): void => {
+                        this.handleReset();
                         this.setIsDisabled(!this.state.isDisabled);
-                        this.handleClear();
                     }}>
                     Reset
                 </Button>

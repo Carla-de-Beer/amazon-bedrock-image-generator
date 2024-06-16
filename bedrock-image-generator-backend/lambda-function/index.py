@@ -63,10 +63,10 @@ def lambda_handler(event, context):
                 'textToImageParams': text_to_image_params,
                 'imageGenerationConfig': {
                     'numberOfImages': number_of_images,
-                    'quality': 'standard',
+                    'quality': 'premium',
                     'height': height,
                     'width': width,
-                    'cfgScale': 6.5
+                    'cfgScale': 7.5
                 }
             }
         )
@@ -77,7 +77,8 @@ def lambda_handler(event, context):
             body=body,
             modelId='amazon.titan-image-generator-v1',
             accept='application/json',
-            contentType='application/json')
+            contentType='application/json'
+        )
 
         logger.info('Model response:', response)
 
@@ -85,7 +86,10 @@ def lambda_handler(event, context):
 
     except Exception as e:
         logger.error(f"Could not invoke the Titan Image Generator Model: {e}.")
-        raise
+        return {
+            'statusCode': 500,
+            'body': json.dumps(e)
+        }
 
     try:
         image_array = response_bytes['images']
@@ -122,4 +126,7 @@ def lambda_handler(event, context):
 
     except Exception as e:
         logger.error(f"Could not generate the pre-signed URLs: {e}.")
-        raise
+        return {
+            'statusCode': 500,
+            'body': json.dumps(e)
+        }

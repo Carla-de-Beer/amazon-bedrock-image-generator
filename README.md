@@ -1,12 +1,19 @@
 # Amazon Bedrock Image Generator
 ![badge](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/actions/workflows/test-build.yml/badge.svg?event=push)
 
-This project consists of a React application seamlessly integrated with AWS services, including API Gateway and Lambda. It
-empowers users to request images through prompts, initiating a process within the Lambda function triggered by API
-Gateway. The application then showcases the requested images within its user interface, offering a dynamic and
-responsive experience.
+This project consists of a React application integrated with AWS to create and display generative AI images based on textual prompts. 
+Users can interact with the underlying Amazon Bedrock model through an AWS Lambda function, which, in turn, is accessed via the AWS API Gateway. 
+The application processes the requests and dynamically displays the generated images in a responsive user interface.
 
-Image generator app that generates a GenAI image via Amazon Bedrock based on a textual prompt.
+<figure>
+  <img src="./images/birdie-laptop.png" style="width: 50%"/>
+  <figcaption><i>Prompt: "Image of a red cardinal standing on a laptop in an office"</i></figcaption>
+</figure>
+<br/><br/>
+<figure>
+  <img src="./images/giraffe-nyc.png" style="width: 50%"/>
+  <figcaption><i>Prompt: "Image of a giraffe in New York"</i></figcaption>
+</figure>
 
 ## App architecture
 
@@ -16,6 +23,8 @@ Image generator app that generates a GenAI image via Amazon Bedrock based on a t
   The Lambda function then invokes the foundation model inside Bedrock and saved the resulting image inside an S3
   bucket,
   before forwarding the presigned URL to API Gateway.
+
+<br/><br/>
 
 ![App architecture](images/AWS-architecture.png "AWS Architecture")
 
@@ -27,9 +36,10 @@ Bedrock model.
 
 The body of the Lambda function takes the following parameters:
 
-* `prompt`: text description of the image to be generated (required)
+* `prompt`: text prompt to generate the image (required)
+* `negativeText`: text prompt to define what not to include in the image (optional)
 * `numberOfImages`: number of image variations to be generated (optional, defaults to 1)
-* `landscapeFormat`: true, for landscape format, false for portrait (optional, defaults to landscapeFormat)
+* `landscapeFormat`: true, for landscape format, false for portrait (optional, defaults to landscape format)
 
 The following POST request will provide the link to the pre-signed URL:
 
@@ -37,12 +47,16 @@ The following POST request will provide the link to the pre-signed URL:
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "Image of a red cardinal standing on a laptop in an office",
-    "numberOfImages": 2,
-    "landscapeFormat": true
+    "prompt": "Image of a giraffe standing in Times Square",
+    "numberOfImages": 1,
+    "negativeText": "yellow taxis",
+    "landscapeFormat": false
   }' \
   https://API-GATEWAY-URL-GOES-HERE
 ```
+This, in turn, provides access to the base64-encoded image:
+
+<img src="./images/giraffe-times-square-no-taxis.png" style="height: 600px"/>
 
 The Lambda function with basic API Gateway access can be applied directly via either the provided [CDK
 Python or Terraform scripts](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-backend/iac).
@@ -71,6 +85,4 @@ for download in one of 3 file format options.
 
 The app was built and tested with Google Chrome only.
 
-![WordPainter UI](images/ui-image-01.png)
-
-![WordPainter UI](images/ui-image-02.png)
+![WordPainter UI](images/ui-image.png)
