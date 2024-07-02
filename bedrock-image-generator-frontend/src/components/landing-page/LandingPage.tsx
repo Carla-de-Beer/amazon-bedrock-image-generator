@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@mui/material/Button';
-import {Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Slider, TextField} from '@mui/material';
+import {Box, FormControl, FormControlLabel, Radio, RadioGroup, Slider, TextField} from '@mui/material';
 import ImageDisplay from '../image-display/ImageDisplay';
 import './LandingPage.scss';
 
@@ -14,6 +14,7 @@ export default class LandingPage extends React.Component {
         prompt: '',
         negativeText: '',
         numberOfImages: 1,
+        cfgScale: 7.5,
         radioValue: 'landscape',
         landscapeFormat: true,
         isShow: false,
@@ -37,6 +38,12 @@ export default class LandingPage extends React.Component {
     setNumberOfImages(numberOfImages: number): void {
         this.setState({
             numberOfImages: numberOfImages
+        });
+    }
+
+    setCfgScale(cfgScale: number): void {
+        this.setState({
+            cfgScale: cfgScale
         });
     }
 
@@ -84,8 +91,12 @@ export default class LandingPage extends React.Component {
         }
     };
 
-    handleSliderChange = (_: Event, newValue: number | number[]): void => {
+    handleNumImagesSliderChange = (_: Event, newValue: number | number[]): void => {
         this.setNumberOfImages(newValue as number);
+    };
+
+    handleCfgScaleSliderChange = (_: Event, newValue: number | number[]): void => {
+        this.setCfgScale(newValue as number);
     };
 
     handleReset = (): void => {
@@ -97,7 +108,7 @@ export default class LandingPage extends React.Component {
     };
 
     render(): React.JSX.Element {
-        const marks = [
+        const marksNumImages = [
             {
                 value: 1,
                 label: '1',
@@ -109,6 +120,49 @@ export default class LandingPage extends React.Component {
             {
                 value: 3,
                 label: '3',
+            }
+        ];
+
+        const marksCfgScale = [
+            {
+                value: 1,
+                label: '1.1',
+            },
+            {
+                value: 2,
+                label: '2.0',
+            },
+            {
+                value: 3,
+                label: '3.0',
+            },
+            {
+                value: 4,
+                label: '4.0',
+            },
+            {
+                value: 5,
+                label: '5.0',
+            },
+            {
+                value: 6,
+                label: '6.0',
+            },
+            {
+                value: 7,
+                label: '7.0',
+            },
+            {
+                value: 8,
+                label: '8.0',
+            },
+            {
+                value: 9,
+                label: '9.0',
+            },
+            {
+                value: 10,
+                label: '10.0',
             }
         ];
 
@@ -171,24 +225,38 @@ export default class LandingPage extends React.Component {
                         paddingLeft: '50px',
                         marginTop: '-5px'
                     }}>
-                        <Box sx={{paddingBottom: '20px', width: '100%'}}>
-                            <label htmlFor='num-images-slider'>Number of images to generate</label>
+                        <Box sx={{paddingBottom: '25px', width: '100%'}}>
+                            <label htmlFor='num-images-slider'>Number of images</label>
                             <Slider
-                                data-cy='slider'
+                                data-cy='num-images-slider'
                                 id='num-images-slider'
                                 value={this.state.numberOfImages}
                                 disabled={this.state.isDisabled}
                                 defaultValue={1}
                                 min={1}
                                 max={3}
-                                marks={marks}
+                                marks={marksNumImages}
                                 aria-label='slider'
                                 style={{width: '100%'}}
-                                onChange={this.handleSliderChange}
+                                onChange={this.handleNumImagesSliderChange}
+                            />
+                            <label htmlFor='cfgScale-slider'>Classifier-Free Guidance Scale</label>
+                            <Slider
+                                data-cy='cfgScale-slider'
+                                id='cfgScale-slider'
+                                value={this.state.cfgScale}
+                                disabled={this.state.isDisabled}
+                                defaultValue={7.5}
+                                min={1.5}
+                                max={10.0}
+                                step={0.5}
+                                marks={marksCfgScale}
+                                aria-label='slider'
+                                style={{width: '100%'}}
+                                onChange={this.handleCfgScaleSliderChange}
                             />
                         </Box>
                         <FormControl>
-                            <FormLabel id='row-radio-buttons-group-label'>Format</FormLabel>
                             <RadioGroup
                                 data-cy='radio-group'
                                 row
@@ -249,6 +317,7 @@ export default class LandingPage extends React.Component {
                                 prompt: this.state.prompt,
                                 negativeText: this.state.negativeText || '',
                                 numberOfImages: this.state.numberOfImages || 1,
+                                cfgScale: this.state.cfgScale || 7.5,
                                 landscapeFormat: this.state.landscapeFormat
                             }}
                             parentCallbackIsLoading={this.setIsLoading}

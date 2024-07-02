@@ -2,6 +2,8 @@ describe('Landing Page', () => {
     it('should render landing page', () => {
         cy.visit('http://localhost:3000');
 
+        cy.viewport(1500, 750);
+
         cy.get('[data-cy="title"]')
             .should('be.visible')
             .and('have.text', 'RockArt');
@@ -9,8 +11,13 @@ describe('Landing Page', () => {
         cy.get('[data-cy="textfield-prompt"]').should('be.visible');
         cy.get('[data-cy="textfield-negative-text"]').should('be.visible');
 
-        cy.get('[data-cy="slider"]')
+        cy.get('[data-cy="num-images-slider"]')
             .find('input[value="1"]')
+            .should('be.visible')
+            .and('be.enabled');
+
+        cy.get('[data-cy="cfgScale-slider"]')
+            .find('input[value="7.5"]')
             .should('be.visible')
             .and('be.enabled');
 
@@ -37,6 +44,5 @@ describe('Landing Page', () => {
 
         cy.get('[data-cy="generate-button"]')
             .should('be.enabled');
-
     })
 });

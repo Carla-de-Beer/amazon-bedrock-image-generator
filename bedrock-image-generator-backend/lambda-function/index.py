@@ -30,6 +30,11 @@ def lambda_handler(event, context):
         }
 
     try:
+        cfgScale = request_body.get('cfgScale')
+
+        if cfgScale is None:
+            cfgScale = 7.5
+
         negative_text = request_body.get('negativeText')
 
         text_to_image_params = {}
@@ -66,18 +71,20 @@ def lambda_handler(event, context):
                     'quality': 'premium',
                     'height': height,
                     'width': width,
-                    'cfgScale': 7.5
+                    'cfgScale': cfgScale
                 }
             }
         )
 
         logger.info('Model payload:', body)
 
+        accept = contentType = 'application/json'
+
         response = client_bedrock.invoke_model(
             body=body,
             modelId='amazon.titan-image-generator-v1',
-            accept='application/json',
-            contentType='application/json'
+            accept=accept,
+            contentType=contentType
         )
 
         logger.info('Model response:', response)

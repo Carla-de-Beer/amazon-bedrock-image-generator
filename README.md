@@ -39,6 +39,7 @@ The body of the Lambda function takes the following parameters:
 * `prompt`: text prompt to generate the image (required)
 * `negativeText`: text prompt to define what not to include in the image (optional)
 * `numberOfImages`: number of image variations to be generated (optional, defaults to 1)
+* `cfgScale`: specifies how strongly the generated image should adhere to the prompt; use a lower value to introduce more randomness in the generation (optional, defaults to 7.5)
 * `landscapeFormat`: true, for landscape format, false for portrait (optional, defaults to landscape format)
 
 The following POST request will provide the link to the pre-signed URL:
@@ -50,6 +51,7 @@ curl -X POST \
     "prompt": "Image of a giraffe standing in Times Square",
     "numberOfImages": 1,
     "negativeText": "yellow taxis",
+    "cfgScale": 5.5,
     "landscapeFormat": false
   }' \
   https://API-GATEWAY-URL-GOES-HERE
