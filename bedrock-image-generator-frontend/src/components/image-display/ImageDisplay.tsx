@@ -43,8 +43,10 @@ export default class ImageDisplay extends React.Component<{
     };
 
     quotes: string[] = [
-        'Anytime someone tells me that I can\'t do something, I want to do it more.',
-        'If you are lucky enough to find something that you love, and you have a shot at being good at it, don\'t stop, don\'t put it down.'
+        'Rock art often has significant cultural and spiritual meanings for indigenous peoples. For example, Aboriginal Australians used rock paintings to convey stories, beliefs, and laws, and as a means of communication across generations.',
+        'Rock painting, also known as rock art, is one of the oldest forms of artistic expression by humans. The oldest known rock paintings are found in Australia, dated to be around 40,000 years old, and in Indonesia, where paintings are estimated to be at least 45,500 years old.',
+        'Rock art is found on every continent, showcasing a wide range of styles and subjects. Notable sites include the Lascaux caves in France, the Bhimbetka rock shelters in India, and the Chauvet Cave in France, known for their exceptional prehistoric art.',
+        'Early rock painters used natural pigments like ochre, charcoal, and hematite, mixed with water, animal fat, or plant extracts. Brushes made from twigs, feathers, or even fingers were common tools.'
     ];
 
     setOpen = (isOpen: boolean): void => {
@@ -207,12 +209,6 @@ export default class ImageDisplay extends React.Component<{
                             }}>
                                 {this.quotes[this.getRandomInt()]}
                             </span>
-                            </p>
-                            <p style={{
-                                fontSize: '14px',
-                                fontWeight: 'normal'
-                            }}>
-                                Taylor Swift
                             </p>
                             <br/>
                         </div>}
