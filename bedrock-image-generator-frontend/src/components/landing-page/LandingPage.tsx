@@ -240,7 +240,7 @@ export default class LandingPage extends React.Component {
                                 style={{width: '100%'}}
                                 onChange={this.handleNumImagesSliderChange}
                             />
-                            <label htmlFor='cfgScale-slider'>Classifier-Free Guidance Scale</label>
+                            <label htmlFor='cfgScale-slider'>Classifier-free guidance scale</label>
                             <Slider
                                 data-cy='cfgScale-slider'
                                 id='cfgScale-slider'
