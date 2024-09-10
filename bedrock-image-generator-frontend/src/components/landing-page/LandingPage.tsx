@@ -5,22 +5,21 @@ import ImageDisplay from '../image-display/ImageDisplay';
 import './LandingPage.scss';
 
 import logo from '../../assets/hand-blue-logo.png';
-
-const MAX_PROMPT_SIZE_IN_CHARS: number = 512;
+import {DEFAULT_SETTINGS, marksCfgScale, marksNumImages, MAX_PROMPT_SIZE_IN_CHARS, Orientation} from "./Constants";
 
 export default class LandingPage extends React.Component {
 
     state = {
         prompt: '',
         negativeText: '',
-        numberOfImages: 1,
-        cfgScale: 7.5,
-        radioValue: 'landscape',
-        landscapeFormat: true,
-        isShow: false,
-        isDisabled: false,
-        isLoading: false,
-        isValidationError: false
+        numberOfImages: DEFAULT_SETTINGS.NUM_IMAGES,
+        cfgScale: DEFAULT_SETTINGS.CFG_SCALE,
+        orientation: DEFAULT_SETTINGS.ORIENTATION,
+        isLandscape: DEFAULT_SETTINGS.IS_LANDSCAPE,
+        isShow: DEFAULT_SETTINGS.IS_SHOW,
+        isDisabled: DEFAULT_SETTINGS.IS_DISABLED,
+        isLoading: DEFAULT_SETTINGS.IS_LOADING,
+        isValidationError: DEFAULT_SETTINGS.IS_VALIDATION_ERROR
     };
 
     setPrompt(prompt: string): void {
@@ -47,15 +46,15 @@ export default class LandingPage extends React.Component {
         });
     }
 
-    setRadioValue = (radioValue: string): void => {
+    setOrientation = (orientation: string): void => {
         this.setState({
-            radioValue: radioValue
+            orientation: orientation
         });
     };
 
-    setLandscapeFormat(landscapeFormat: boolean): void {
+    setIsLandscape(isLandscape: boolean): void {
         this.setState({
-            landscapeFormat: landscapeFormat
+            isLandscape: isLandscape
         });
     }
 
@@ -102,70 +101,17 @@ export default class LandingPage extends React.Component {
     handleReset = (): void => {
         this.setPrompt('');
         this.setNegativeText('');
-        this.setNumberOfImages(1);
-        this.setRadioValue('landscape');
-        this.setIsShow(false);
+        this.setNumberOfImages(DEFAULT_SETTINGS.NUM_IMAGES);
+        this.setCfgScale(DEFAULT_SETTINGS.CFG_SCALE);
+        this.setOrientation(DEFAULT_SETTINGS.ORIENTATION);
+        this.setIsLandscape(DEFAULT_SETTINGS.IS_LANDSCAPE);
+        this.setIsShow(DEFAULT_SETTINGS.IS_SHOW);
+        this.setIsDisabled(DEFAULT_SETTINGS.IS_DISABLED);
+        this.setIsLoading(DEFAULT_SETTINGS.IS_LOADING);
+        this.setIsValidationError(DEFAULT_SETTINGS.IS_VALIDATION_ERROR);
     };
 
     render(): React.JSX.Element {
-        const marksNumImages = [
-            {
-                value: 1,
-                label: '1',
-            },
-            {
-                value: 2,
-                label: '2',
-            },
-            {
-                value: 3,
-                label: '3',
-            }
-        ];
-
-        const marksCfgScale = [
-            {
-                value: 1,
-                label: '1.1',
-            },
-            {
-                value: 2,
-                label: '2.0',
-            },
-            {
-                value: 3,
-                label: '3.0',
-            },
-            {
-                value: 4,
-                label: '4.0',
-            },
-            {
-                value: 5,
-                label: '5.0',
-            },
-            {
-                value: 6,
-                label: '6.0',
-            },
-            {
-                value: 7,
-                label: '7.0',
-            },
-            {
-                value: 8,
-                label: '8.0',
-            },
-            {
-                value: 9,
-                label: '9.0',
-            },
-            {
-                value: 10,
-                label: '10.0',
-            }
-        ];
-
         return (
             <div style={{paddingTop: '20px', paddingLeft: '95px', maxWidth: '1400px'}}>
                 <div className='header-container'>
@@ -232,9 +178,9 @@ export default class LandingPage extends React.Component {
                                 id='num-images-slider'
                                 value={this.state.numberOfImages}
                                 disabled={this.state.isDisabled}
-                                defaultValue={1}
-                                min={1}
-                                max={3}
+                                defaultValue={DEFAULT_SETTINGS.NUM_IMAGES}
+                                min={DEFAULT_SETTINGS.NUM_IMAGES_MIN}
+                                max={DEFAULT_SETTINGS.NUM_IMAGES_MAX}
                                 marks={marksNumImages}
                                 aria-label='slider'
                                 style={{width: '100%'}}
@@ -246,10 +192,10 @@ export default class LandingPage extends React.Component {
                                 id='cfgScale-slider'
                                 value={this.state.cfgScale}
                                 disabled={this.state.isDisabled}
-                                defaultValue={7.5}
-                                min={1.5}
-                                max={10.0}
-                                step={0.5}
+                                defaultValue={DEFAULT_SETTINGS.CFG_SCALE}
+                                min={DEFAULT_SETTINGS.CFG_SCALE_MIN}
+                                max={DEFAULT_SETTINGS.CFG_SCALE_MAX}
+                                step={DEFAULT_SETTINGS.CFG_SCALE_STEP}
                                 marks={marksCfgScale}
                                 aria-label='slider'
                                 style={{width: '100%'}}
@@ -258,28 +204,28 @@ export default class LandingPage extends React.Component {
                         </Box>
                         <FormControl>
                             <RadioGroup
-                                data-cy='radio-group'
+                                data-cy='orientation-radio-group'
                                 row
-                                aria-labelledby='row-radio-buttons-group-label'
-                                name='row-radio-buttons-group'
-                                value={this.state.radioValue}
-                                defaultValue='landscape'
+                                aria-labelledby='radioValue-radio-buttons-group-label'
+                                name='radioValue-radio-buttons-group'
+                                value={this.state.orientation}
+                                defaultValue={Orientation.LANDSCAPE}
                                 onChange={(e): void => {
-                                    if (e.target.value === 'landscape') {
-                                        this.setLandscapeFormat(true);
+                                    if (e.target.value === Orientation.LANDSCAPE) {
+                                        this.setIsLandscape(true);
                                     } else {
-                                        this.setLandscapeFormat(false);
+                                        this.setIsLandscape(false);
                                     }
-                                    this.setRadioValue(e.target.value);
+                                    this.setOrientation(e.target.value);
                                 }}>
                                 <FormControlLabel
-                                    value='landscape'
+                                    value={Orientation.LANDSCAPE}
                                     control={<Radio/>}
                                     label='Landscape'
                                     disabled={this.state.isDisabled}
                                 />
                                 <FormControlLabel
-                                    value='portrait'
+                                    value={Orientation.PORTRAIT}
                                     control={<Radio/>}
                                     label='Portrait'
                                     disabled={this.state.isDisabled}
@@ -316,9 +262,9 @@ export default class LandingPage extends React.Component {
                             parameters={{
                                 prompt: this.state.prompt,
                                 negativeText: this.state.negativeText || '',
-                                numberOfImages: this.state.numberOfImages || 1,
-                                cfgScale: this.state.cfgScale || 7.5,
-                                landscapeFormat: this.state.landscapeFormat
+                                numberOfImages: this.state.numberOfImages || DEFAULT_SETTINGS.NUM_IMAGES,
+                                cfgScale: this.state.cfgScale || DEFAULT_SETTINGS.CFG_SCALE,
+                                isLandscape: this.state.isLandscape
                             }}
                             parentCallbackIsLoading={this.setIsLoading}
                             parentCallbackIsDisabled={this.setIsDisabled}

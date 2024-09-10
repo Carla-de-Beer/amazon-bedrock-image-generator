@@ -21,10 +21,10 @@ describe('Landing Page', () => {
             .should('be.visible')
             .and('be.enabled');
 
-        cy.get('[data-cy="radio-group"]')
+        cy.get('[data-cy="orientation-radio-group"]')
             .should('be.visible');
 
-        cy.get('[data-cy="radio-group"]')
+        cy.get('[data-cy="orientation-radio-group"]')
             .find('input[value="landscape"]')
             .should('be.checked')
             .and('be.enabled');

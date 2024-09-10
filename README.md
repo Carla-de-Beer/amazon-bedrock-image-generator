@@ -40,7 +40,7 @@ The body of the Lambda function takes the following parameters:
 * `negativeText`: text prompt to define what not to include in the image (optional)
 * `numberOfImages`: number of image variations to be generated (optional, defaults to 1)
 * `cfgScale`: specifies how strongly the generated image should adhere to the prompt; use a lower value to introduce more randomness in the generation (optional, defaults to 7.5)
-* `landscapeFormat`: true, for landscape format, false for portrait (optional, defaults to landscape format)
+* `isLandscape`: true, for landscape format, false for portrait (optional, defaults to landscape format)
 
 The following POST request will provide the link to the pre-signed URL:
 
@@ -52,7 +52,7 @@ curl -X POST \
     "numberOfImages": 1,
     "negativeText": "yellow taxis",
     "cfgScale": 5.5,
-    "landscapeFormat": false
+    "isLandscape": false
   }' \
   https://API-GATEWAY-URL-GOES-HERE
 ```
@@ -80,7 +80,7 @@ The IaC scripts automatically take care of the necessary CORS settings. They can
 ## [Frontend code](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-frontend)
 
 The frontend consists of a simple React application that provides a GUI to allow for more convenient interaction with the Bedrock
-model. One or more images (up to a maximum of 4) can be created in either landscape or portrait mode, and made available
+model. One or more images (up to a maximum of 3) can be created in either landscape or portrait mode, and made available
 for download in one of 3 file format options.
 
 ## RockArt UI

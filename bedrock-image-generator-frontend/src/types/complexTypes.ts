@@ -3,5 +3,5 @@ export type ImageParameters = {
     negativeText?: string;
     numberOfImages?: number;
     cfgScale?: number;
-    landscapeFormat: boolean;
+    isLandscape: boolean;
 };

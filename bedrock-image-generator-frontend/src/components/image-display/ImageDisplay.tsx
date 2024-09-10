@@ -191,7 +191,7 @@ export default class ImageDisplay extends React.Component<{
                 <br/>
                 <div
                     style={{
-                        marginLeft: this.state.isDone && !this.props.parameters.landscapeFormat
+                        marginLeft: this.state.isDone && !this.props.parameters.isLandscape
                             ? `-40px`
                             : '-10px'
                     }}>
@@ -216,10 +216,10 @@ export default class ImageDisplay extends React.Component<{
                     {this.state.imageUrls?.length > 0 &&
                         <ImageList
                             sx={
-                                this.props.parameters.landscapeFormat
+                                this.props.parameters.isLandscape
                                     ? {width: 1650, height: 525, paddingLeft: -8}
                                     : {width: 1100, height: 1200, paddingLeft: -30}}
-                            cols={this.props.parameters.landscapeFormat ? 2 : 3}
+                            cols={this.props.parameters.isLandscape ? 2 : 3}
                             rowHeight={500}>
                             {this.state.imageUrls.map((url: string, index: number) => (
                                 <ImageListItem key={url}>

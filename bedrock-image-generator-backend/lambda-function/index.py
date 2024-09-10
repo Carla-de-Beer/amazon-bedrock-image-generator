@@ -50,7 +50,7 @@ def lambda_handler(event, context):
             }
 
         number_of_images = request_body.get('numberOfImages')
-        landscape_format = request_body.get('landscapeFormat')
+        is_landscape_format = request_body.get('isLandscape')
 
         if number_of_images is None:
             number_of_images = 1
@@ -58,7 +58,7 @@ def lambda_handler(event, context):
         width = 768
         height = 1280
 
-        if landscape_format is True or landscape_format is None:
+        if is_landscape_format is True or is_landscape_format is None:
             width = 1280
             height = 768
 
