@@ -4,6 +4,12 @@ variable "region_name" {
   default     = "us-east-1"
 }
 
+variable "stage_name" {
+  description = "API Gateway stage"
+  type        = string
+  default     = "dev"
+}
+
 variable "tags" {
   description = "Tags to be applied to the resources"
   type        = map(string)

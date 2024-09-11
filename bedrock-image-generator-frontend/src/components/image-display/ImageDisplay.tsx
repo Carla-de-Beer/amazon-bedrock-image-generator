@@ -127,7 +127,7 @@ export default class ImageDisplay extends React.Component<{
         this.props.parentCallbackIsDisabled(true);
         this.props.parentCallbackIsLoading(true);
 
-        axios.post('API-GATEWAY-URL-GOES-HERE', {
+        axios.post('https://<GATEWAY_API_ID>.execute-api.<REGION>.amazonaws.com/<STAGE>/<RESOURCE>', {
             ...this.props.parameters
         }, {
             responseType: 'arraybuffer'

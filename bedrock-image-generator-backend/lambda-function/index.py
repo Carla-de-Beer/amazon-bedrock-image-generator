@@ -8,6 +8,8 @@ import logging
 REGION_NAME = os.environ['REGION_NAME']
 IMAGE_STORAGE_BUCKET = os.environ['IMAGE_STORAGE_BUCKET']
 
+IMAGE_QUALITY = 'premium'
+
 client_bedrock = boto3.client('bedrock-runtime', region_name=REGION_NAME)
 client_s3 = boto3.client('s3')
 logger = logging.getLogger(__name__)
@@ -68,7 +70,7 @@ def lambda_handler(event, context):
                 'textToImageParams': text_to_image_params,
                 'imageGenerationConfig': {
                     'numberOfImages': number_of_images,
-                    'quality': 'premium',
+                    'quality': IMAGE_QUALITY,
                     'height': height,
                     'width': width,
                     'cfgScale': cfgScale
@@ -76,7 +78,7 @@ def lambda_handler(event, context):
             }
         )
 
-        logger.info('Model payload:', body)
+        logger.info('Model payload: %s', body)
 
         accept = contentType = 'application/json'
 
@@ -87,7 +89,7 @@ def lambda_handler(event, context):
             contentType=contentType
         )
 
-        logger.info('Model response:', response)
+        logger.info('Model response: %s', response)
 
         response_bytes = json.loads(response['body'].read())
 
@@ -100,6 +102,9 @@ def lambda_handler(event, context):
 
     try:
         image_array = response_bytes['images']
+
+        logger.info(f"Number of images received: {len(image_array)}")
+
         presigned_urls = []
 
         for i in range(len(image_array)):

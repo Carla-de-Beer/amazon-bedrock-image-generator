@@ -18,7 +18,7 @@ resource "aws_s3_bucket_cors_configuration" "images_bucket_cors" {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "POST"]
     allowed_origins = ["*"]
-    expose_headers  = [
+    expose_headers = [
       "x-amz-server-side-encryption",
       "x-amz-request-id",
       "x-amz-id-2"
@@ -33,14 +33,14 @@ data "archive_file" "zip_the_python_code" {
   output_path = "${var.function_filepath}/index.zip"
 }
 
-resource "aws_lambda_function" "images_lambda_tf" {
+resource "aws_lambda_function" "image_generator_lambda" {
   description   = "Lambda function for the bedrock image generator"
   filename      = "${var.function_filepath}/index.zip"
-  function_name = "images_lambda"
+  function_name = "image_generator_lambda"
   runtime       = "python3.12"
   handler       = "index.lambda_handler"
   timeout       = 90
-  role          = aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.image_generator_lambda_role.arn
   depends_on    = [aws_iam_role_policy_attachment.lambda_exec_attachment]
 
   environment {
@@ -53,11 +53,11 @@ resource "aws_lambda_function" "images_lambda_tf" {
   tags = var.tags
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "lambda_role"
+resource "aws_iam_role" "image_generator_lambda_role" {
+  name = "image_generator_lambda_role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Action = "sts:AssumeRole"
@@ -72,12 +72,12 @@ resource "aws_iam_role" "lambda_role" {
   tags = var.tags
 }
 
-resource "aws_iam_policy" "lambda_policy" {
+resource "aws_iam_policy" "image_generator_lambda_policy" {
   description = "AWS IAM Policy for managing aws lambda role"
-  name        = "lambda_policy"
+  name        = "image_generator_lambda_policy"
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -113,8 +113,8 @@ resource "aws_iam_policy" "lambda_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_exec_attachment" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.lambda_policy.arn
+  role       = aws_iam_role.image_generator_lambda_role.name
+  policy_arn = aws_iam_policy.image_generator_lambda_policy.arn
 }
 
 resource "aws_api_gateway_rest_api" "image_generator_gateway_api" {
@@ -147,7 +147,7 @@ resource "aws_api_gateway_integration" "lambda_integration_post" {
   http_method             = aws_api_gateway_method.gateway_post_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.images_lambda_tf.invoke_arn
+  uri                     = aws_lambda_function.image_generator_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_method_response" "post_method_response_200" {
@@ -178,7 +178,7 @@ resource "aws_api_gateway_integration" "lambda_integration_options" {
   http_method          = aws_api_gateway_method.gateway_options_method.http_method
   cache_key_parameters = []
   type                 = "MOCK"
-  request_parameters = {}
+  request_parameters   = {}
   request_templates = {
     "application/json" = jsonencode(
       {
@@ -221,13 +221,22 @@ resource "aws_api_gateway_method_response" "options_method_response_200" {
   }
 }
 
-resource "aws_lambda_permission" "api_gateway_permission" {
-  statement_id  = "AllowAPIGatewayInvoke"
+resource "aws_lambda_permission" "api_gateway_permission_options" {
+  statement_id  = "allow_api_gateway_options_invoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.images_lambda_tf.function_name
+  function_name = aws_lambda_function.image_generator_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.image_generator_gateway_api.execution_arn}/*/*"
+  source_arn = "${aws_api_gateway_rest_api.image_generator_gateway_api.execution_arn}/*/OPTIONS/${aws_api_gateway_resource.image_resource.path_part}"
+}
+
+resource "aws_lambda_permission" "api_gateway_permission_post" {
+  statement_id  = "allow_api_gateway_post_invoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.image_generator_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.image_generator_gateway_api.execution_arn}/*/POST/${aws_api_gateway_resource.image_resource.path_part}"
 }
 
 resource "aws_api_gateway_deployment" "api_gateway_deployment" {
@@ -237,5 +246,5 @@ resource "aws_api_gateway_deployment" "api_gateway_deployment" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.image_generator_gateway_api.id
-  stage_name  = "dev"
+  stage_name  = var.stage_name
 }

@@ -30,6 +30,9 @@ The application processes the requests and dynamically displays the generated im
 
 ## [Backend code and IaC](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-backend)
 
+**IMPORTANT**: Remember to request access to the **Amazon Titan Image Generator G1 model** within your chosen region inside Amazon
+Bedrock in order to be able to use it.
+
 The backend consists principally of an AWS Lambda function. The Lambda function forwards the request payload to
 the [Amazon Titan Image Generator G1](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-image.html)
 Bedrock model.
@@ -54,13 +57,13 @@ curl -X POST \
     "cfgScale": 5.5,
     "isLandscape": false
   }' \
-  https://API-GATEWAY-URL-GOES-HERE
+  https://<GATEWAY_API_ID>.execute-api.<REGION>.amazonaws.com/<STAGE>/<RESOURCE>
 ```
 This, in turn, provides access to the base64-encoded image:
 
 <img src="./images/giraffe-times-square-no-taxis.png" style="height: 600px"/>
 
-The Lambda function with basic API Gateway access can be applied directly via either the provided [CDK
+The Lambda function together with basic API Gateway access can be applied directly via either the provided [CDK
 Python or Terraform scripts](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-backend/iac).
 
 ### CORS settings inside AWS API Gateway
@@ -85,6 +88,6 @@ for download in one of 3 file format options.
 
 ## RockArt UI
 
-The app was built and tested with Google Chrome only.
+The app was developed and tested exclusively in Google Chrome and is optimised for use on desktop devices with screens ~15" size.
 
 ![WordPainter UI](images/ui-image.png)
