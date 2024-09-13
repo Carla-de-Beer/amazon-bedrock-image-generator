@@ -18,6 +18,7 @@ import './ImageDisplay.scss';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import html2canvas from 'html2canvas';
+import Stopwatch from '../stopwatch/Stopwatch';
 
 export default class ImageDisplay extends React.Component<{
     parameters: ImageParameters,
@@ -212,7 +213,14 @@ export default class ImageDisplay extends React.Component<{
                             </p>
                             <br/>
                         </div>}
-                    {!this.state.isDone && <CircularProgress style={{marginLeft: '10px'}}/>}
+                    <div className="centered-container">
+                        {!this.state.isDone && <CircularProgress style={{marginLeft: '10px'}}/>}
+                    </div>
+                    <div>
+                        {!this.state.isDone &&
+                            <Stopwatch shouldStart={this.state.isLoading} shouldReset={this.state.isDone}/>
+                        }
+                    </div>
                     {this.state.imageUrls?.length > 0 &&
                         <ImageList
                             sx={

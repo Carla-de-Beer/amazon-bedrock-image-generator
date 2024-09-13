@@ -5,7 +5,7 @@ import ImageDisplay from '../image-display/ImageDisplay';
 import './LandingPage.scss';
 
 import logo from '../../assets/hand-blue-logo.png';
-import {DEFAULT_SETTINGS, marksCfgScale, marksNumImages, MAX_PROMPT_SIZE_IN_CHARS, Orientation} from "./Constants";
+import {DEFAULT_SETTINGS, marksCfgScale, marksNumImages, MAX_PROMPT_SIZE_IN_CHARS, Orientation} from './Constants';
 
 export default class LandingPage extends React.Component {
 
