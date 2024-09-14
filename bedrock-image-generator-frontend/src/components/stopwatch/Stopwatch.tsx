@@ -15,19 +15,19 @@ export default function Stopwatch({shouldStart, shouldReset}: StopwatchProps) {
         reset,
     } = useStopwatch({autoStart: true});
 
-    useEffect(() => {
+    useEffect((): void => {
         if (shouldStart) {
             start();
         }
     }, [shouldStart, start]);
 
-    useEffect(() => {
+    useEffect((): void => {
         if (shouldReset) {
             reset();
         }
     }, [shouldReset, reset]);
 
-    const timerColor = (minutes > 0 || (minutes === 0 && seconds >= 25)) ? '#D63230' : '#646464';
+    const timerColor: string = (minutes > 0 || (minutes === 0 && seconds >= 25)) ? '#D63230' : '#646464';
 
     return (
         <div className="stopwatch-container">

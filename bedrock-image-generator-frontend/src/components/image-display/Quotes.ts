@@ -1,0 +1,6 @@
+export const quotes: string[] = [
+    'Rock art often has significant cultural and spiritual meanings for indigenous peoples. For example, Aboriginal Australians used rock paintings to convey stories, beliefs, and laws, and as a means of communication across generations.',
+    'Rock painting, also known as rock art, is one of the oldest forms of artistic expression by humans. The oldest known rock paintings are found in Australia, dated to be around 40,000 years old, and in Indonesia, where paintings are estimated to be at least 45,500 years old.',
+    'Rock art is found on every continent, showcasing a wide range of styles and subjects. Notable sites include the Lascaux caves in France, the Bhimbetka rock shelters in India, and the Chauvet Cave in France, known for their exceptional prehistoric art.',
+    'Early rock painters used natural pigments like ochre, charcoal, and hematite, mixed with water, animal fat, or plant extracts. Brushes made from twigs, feathers, or even fingers were common tools.'
+];

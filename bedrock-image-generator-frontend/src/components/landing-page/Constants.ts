@@ -8,7 +8,7 @@ export enum Orientation {
 export const DEFAULT_SETTINGS = {
     NUM_IMAGES: 1,
     NUM_IMAGES_MIN: 1,
-    NUM_IMAGES_MAX: 3,
+    NUM_IMAGES_MAX: 2,
     CFG_SCALE: 7.5,
     CFG_SCALE_MIN: 1.5,
     CFG_SCALE_MAX: 10.0,

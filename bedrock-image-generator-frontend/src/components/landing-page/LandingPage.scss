@@ -9,6 +9,14 @@
   width: 500px;
 }
 
+.control-parameter-box {
+  display: flex;
+  flex-direction: column;
+  width: 450px;
+  padding-left: 50px;
+  margin-top: -5px;
+}
+
 .modal-style {
   position: absolute;
   top: 50%;
@@ -17,4 +25,8 @@
   width: 400px;
   background-color: #ffffff;
   border: 1px solid #555555;
+}
+
+.image-size-text {
+  margin-left: auto;
 }

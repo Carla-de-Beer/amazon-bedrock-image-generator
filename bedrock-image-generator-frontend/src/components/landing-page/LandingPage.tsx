@@ -6,10 +6,15 @@ import './LandingPage.scss';
 
 import logo from '../../assets/hand-blue-logo.png';
 import {DEFAULT_SETTINGS, marksCfgScale, marksNumImages, MAX_PROMPT_SIZE_IN_CHARS, Orientation} from './Constants';
+import {LandingPageState} from './LandingPageState';
 
 export default class LandingPage extends React.Component {
 
-    state = {
+    public constructor(props: any) {
+        super(props);
+    }
+
+    public state: LandingPageState = {
         prompt: '',
         negativeText: '',
         numberOfImages: DEFAULT_SETTINGS.NUM_IMAGES,
@@ -22,83 +27,7 @@ export default class LandingPage extends React.Component {
         isValidationError: DEFAULT_SETTINGS.IS_VALIDATION_ERROR
     };
 
-    setPrompt(prompt: string): void {
-        this.setState({
-            prompt: prompt
-        });
-    }
-
-    setNegativeText(negativeText: string): void {
-        this.setState({
-            negativeText: negativeText
-        });
-    }
-
-    setNumberOfImages(numberOfImages: number): void {
-        this.setState({
-            numberOfImages: numberOfImages
-        });
-    }
-
-    setCfgScale(cfgScale: number): void {
-        this.setState({
-            cfgScale: cfgScale
-        });
-    }
-
-    setOrientation = (orientation: string): void => {
-        this.setState({
-            orientation: orientation
-        });
-    };
-
-    setIsLandscape(isLandscape: boolean): void {
-        this.setState({
-            isLandscape: isLandscape
-        });
-    }
-
-    setIsShow(isShow: boolean): void {
-        this.setState({
-            isShow: isShow
-        });
-    }
-
-    setIsDisabled = (isDisabled: boolean): void => {
-        this.setState({
-            isDisabled: isDisabled
-        });
-    };
-
-    setIsLoading = (isLoading: boolean): void => {
-        this.setState({
-            isLoading: isLoading
-        });
-    };
-
-    setIsValidationError = (isValidationError: boolean): void => {
-        this.setState({
-            isValidationError: isValidationError
-        });
-    };
-
-    handleInputValidation = (prompt: string): void => {
-        if (prompt.length > MAX_PROMPT_SIZE_IN_CHARS || prompt.trim() === '') {
-            this.setIsValidationError(true);
-        } else {
-            this.setIsValidationError(false);
-        }
-    };
-
-    handleNumImagesSliderChange = (_: Event, newValue: number | number[]): void => {
-        this.setNumberOfImages(newValue as number);
-    };
-
-    handleCfgScaleSliderChange = (_: Event, newValue: number | number[]): void => {
-        this.setCfgScale(newValue as number);
-    };
-
-    handleReset = (): void => {
+    private handleReset = (): void => {
         this.setPrompt('');
         this.setNegativeText('');
         this.setNumberOfImages(DEFAULT_SETTINGS.NUM_IMAGES);
@@ -111,9 +40,85 @@ export default class LandingPage extends React.Component {
         this.setIsValidationError(DEFAULT_SETTINGS.IS_VALIDATION_ERROR);
     };
 
-    render(): React.JSX.Element {
+    private setPrompt(prompt: string): void {
+        this.setState({
+            prompt: prompt
+        });
+    }
+
+    private setNegativeText(negativeText: string): void {
+        this.setState({
+            negativeText: negativeText
+        });
+    }
+
+    private setNumberOfImages(numberOfImages: number): void {
+        this.setState({
+            numberOfImages: numberOfImages
+        });
+    }
+
+    private setCfgScale(cfgScale: number): void {
+        this.setState({
+            cfgScale: cfgScale
+        });
+    }
+
+    private setOrientation = (orientation: string): void => {
+        this.setState({
+            orientation: orientation
+        });
+    };
+
+    private setIsLandscape(isLandscape: boolean): void {
+        this.setState({
+            isLandscape: isLandscape
+        });
+    }
+
+    private setIsShow(isShow: boolean): void {
+        this.setState({
+            isShow: isShow
+        });
+    }
+
+    private setIsDisabled = (isDisabled: boolean): void => {
+        this.setState({
+            isDisabled: isDisabled
+        });
+    };
+
+    private setIsLoading = (isLoading: boolean): void => {
+        this.setState({
+            isLoading: isLoading
+        });
+    };
+
+    private setIsValidationError = (isValidationError: boolean): void => {
+        this.setState({
+            isValidationError: isValidationError
+        });
+    };
+
+    private handleInputValidation = (prompt: string): void => {
+        if (prompt.length > MAX_PROMPT_SIZE_IN_CHARS || prompt.trim() === '') {
+            this.setIsValidationError(true);
+        } else {
+            this.setIsValidationError(false);
+        }
+    };
+
+    private handleNumImagesSliderChange = (_: Event, newValue: number | number[]): void => {
+        this.setNumberOfImages(newValue as number);
+    };
+
+    private handleCfgScaleSliderChange = (_: Event, newValue: number | number[]): void => {
+        this.setCfgScale(newValue as number);
+    };
+
+    public render(): React.JSX.Element {
         return (
-            <div style={{paddingTop: '20px', paddingLeft: '95px', maxWidth: '1400px'}}>
+            <div style={{paddingTop: '20px', paddingLeft: '75px', maxWidth: '1400px'}}>
                 <div className='header-container'>
                     <img
                         src={logo}
@@ -164,13 +169,7 @@ export default class LandingPage extends React.Component {
                             size='medium'
                         />
                     </Box>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        width: '450px',
-                        paddingLeft: '50px',
-                        marginTop: '-5px'
-                    }}>
+                    <Box className={'control-parameter-box'}>
                         <Box sx={{paddingBottom: '25px', width: '100%'}}>
                             <label htmlFor='num-images-slider'>Number of images</label>
                             <Slider
@@ -230,6 +229,11 @@ export default class LandingPage extends React.Component {
                                     label='Portrait'
                                     disabled={this.state.isDisabled}
                                 />
+                                <p data-cy='size-information'
+                                   style={{color: '#646464', fontSize: '14px'}}
+                                   className="image-size-text">
+                                    {this.state.isLandscape ? 'Pixel size: 1280 x 768 | 5:3' : 'Pixel size: 768 x 1280 | 3:5'}
+                                </p>
                             </RadioGroup>
                         </FormControl>
                     </Box>

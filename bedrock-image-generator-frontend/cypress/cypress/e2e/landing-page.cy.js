@@ -29,6 +29,9 @@ describe('Landing Page', () => {
             .should('be.checked')
             .and('be.enabled');
 
+        cy.get('[data-cy="size-information"]')
+            .and('be.visible');
+
         cy.get('[data-cy="generate-button"]')
             .should('be.visible')
             .and('have.text', 'Generate with Bedrock')
