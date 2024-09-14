@@ -17,8 +17,11 @@ import {ImageParameters} from '../../types/complexTypes';
 import './ImageDisplay.scss';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
-import html2canvas from 'html2canvas';
 import Stopwatch from '../stopwatch/Stopwatch';
+
+import {ImageDisplayState} from './ImageDisplayState';
+
+const API_GATEWAY_URL = 'https://<GATEWAY_API_ID>.execute-api.<REGION>.amazonaws.com/<STAGE>/<RESOURCE>';
 
 export default class ImageDisplay extends React.Component<{
     parameters: ImageParameters,
@@ -31,7 +34,8 @@ export default class ImageDisplay extends React.Component<{
         this.injectHtml2canvas();
     }
 
-    state = {
+    state: ImageDisplayState = {
+        base64Urls: [],
         imageUrls: [],
         isDone: false,
         isLoading: true,
@@ -97,83 +101,117 @@ export default class ImageDisplay extends React.Component<{
         this.injectScript('//html2canvas.hertzen.com/dist/html2canvas.js');
     };
 
-    saveScreenshot = (canvas: any): void => {
-        let fileName: string = this.state.filename;
+    downloadBase64Image = async (): Promise<void> => {
+        const base64Url: string = this.state.base64Urls[this.state.currentIndex];
+        const imageUrl: string = `data:image/${this.state.fileFormat};base64,` + base64Url.trim();
 
-        if (!fileName) {
-            fileName = this.state.filenames[this.state.currentIndex];
-        }
+        const imageFile: string = this.convertBase64ToFileToImage(imageUrl);
 
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.download = fileName + '.' + this.state.fileFormat;
-        canvas.toBlob((blob: any): void => {
-            link.href = URL.createObjectURL(blob);
-            link.click();
-        });
-    };
-
-    downloadImage = async (): Promise<void> => {
         this.setOpen(false);
-        const canvas: HTMLCanvasElement = await html2canvas(document.querySelector(this.state.currentImage) as HTMLElement, {
-            allowTaint: true,
-            useCORS: true
-        });
-
         this.setFilename('');
 
-        return this.saveScreenshot(canvas);
+        return this.triggerImageDownload(imageFile);
     };
 
-    componentDidMount(): void {
+    convertBase64ToFileToImage = (base64: string): string => {
+        try {
+            const byteString: string = atob(base64.split(',')[1]);
+            const mimeType: string = base64.split(',')[0].split(':')[1].split(';')[0];
+
+            const arrayBuffer: ArrayBuffer = new ArrayBuffer(byteString.length);
+            const intArray: Uint8Array = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < byteString.length; ++i) {
+                intArray[i] = byteString.charCodeAt(i);
+            }
+
+            const blob = new Blob([arrayBuffer], {type: mimeType});
+
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error('Error converting base64 to file:', error);
+            return '';
+        }
+    };
+
+    triggerImageDownload = (blobUrl: string): void => {
+        try {
+            let fileName: string = this.state.filename;
+
+            if (!fileName) {
+                fileName = this.state.filenames[this.state.currentIndex];
+            }
+
+            const link: HTMLAnchorElement = document.createElement('a');
+            link.download = fileName + '.' + this.state.fileFormat;
+            link.href = blobUrl;
+            link.click();
+
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error('Error triggering image download:', error);
+        }
+    };
+
+    async componentDidMount(): Promise<void> {
         this.props.parentCallbackIsDisabled(true);
         this.props.parentCallbackIsLoading(true);
 
-        axios.post('https://<GATEWAY_API_ID>.execute-api.<REGION>.amazonaws.com/<STAGE>/<RESOURCE>', {
-            ...this.props.parameters
-        }, {
-            responseType: 'arraybuffer'
-        }).then((response: AxiosResponse<any, any>): void => {
-                const s3Requests: Promise<AxiosResponse<any>>[] = [];
+        try {
+            const response = await axios.post(API_GATEWAY_URL, this.props.parameters, {
+                responseType: 'arraybuffer'
+            });
 
-                const presignedUrls: string[] = JSON.parse(new TextDecoder().decode(response.data));
+            const presignedUrls: string[] = JSON.parse(new TextDecoder().decode(response.data));
+            const s3Requests = presignedUrls.map(url => axios.get(url, {responseType: 'arraybuffer'}));
 
-                for (const presignedUrl of presignedUrls) {
-                    const request = axios.get(presignedUrl, {responseType: 'arraybuffer'});
-                    s3Requests.push(request);
-                }
+            const responses = await axios.all(s3Requests);
+            const {base64Urls, imageUrls, filenames} = this.processResponses(responses);
 
-                axios.all(s3Requests)
-                    .then(axios.spread((...responses: AxiosResponse<any, any>[]): void => {
-                        const imageUrls: string[] = [];
-                        const filenames: string [] = [];
+            this.setState({
+                base64Urls,
+                imageUrls,
+                filenames,
+                isDone: true,
+                isLoading: false
+            });
 
-                        for (const response of responses) {
-                            filenames.push(this.extractName(response.config.url as string));
-                            let base64ImageString: string = btoa(new Uint8Array(response.data)
-                                .reduce((data: string, byte: number) => data + String.fromCharCode(byte), ''));
+            this.props.parentCallbackIsLoading(false);
 
-                            const imageUrl: string = 'data:image/PNG;base64,' + base64ImageString.trim();
-                            imageUrls.push(imageUrl);
-                        }
-
-                        this.setState({
-                            imageUrls,
-                            isDone: true,
-                            isLoading: false,
-                            filenames: [...filenames]
-                        });
-
-                        this.props.parentCallbackIsLoading(false);
-
-                    })).catch(error => {
-                    console.log(error);
-                    alert(error);
-                });
-            }
-        ).catch(error => {
-            console.error(error);
+        } catch (error) {
             alert(error);
-        });
+            console.error(error);
+            this.setState({isLoading: false});
+            this.props.parentCallbackIsLoading(false);
+        }
+    }
+
+    private processResponses(responses: AxiosResponse<any>[]): {
+        base64Urls: string[],
+        imageUrls: string[],
+        filenames: string[]
+    } {
+        const base64Urls: string[] = [];
+        const imageUrls: string[] = [];
+        const filenames: string[] = [];
+
+        for (const response of responses) {
+            filenames.push(this.extractName(response.config.url as string));
+            const base64ImageString = this.convertArrayBufferToBase64(response.data);
+
+            base64Urls.push(base64ImageString.trim());
+            const imageUrl = `data:image/PNG;base64,${base64ImageString.trim()}`;
+            imageUrls.push(imageUrl);
+        }
+
+        return {base64Urls, imageUrls, filenames};
+    }
+
+    private convertArrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const binaryString = Array.from(uint8Array)
+            .map(byte => String.fromCharCode(byte))
+            .join('');
+        return btoa(binaryString);
     }
 
     extractName(url: string): string {
@@ -310,7 +348,8 @@ export default class ImageDisplay extends React.Component<{
                         <Typography id='modal-modal-description' sx={{mt: 2}}>
                             <Button
                                 variant='contained'
-                                onClick={this.downloadImage}>Download Image</Button>
+                                onClick={this.downloadBase64Image}>Download Image
+                            </Button>
                         </Typography>
                     </Box>
                 </Modal>
