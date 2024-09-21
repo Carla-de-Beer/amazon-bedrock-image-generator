@@ -22,7 +22,7 @@ import Stopwatch from '../stopwatch/Stopwatch';
 import {ImageDisplayState} from './ImageDisplayState';
 import {quotes} from './Quotes';
 
-const API_GATEWAY_URL = 'https://<GATEWAY_API_ID>.execute-api.<REGION>.amazonaws.com/<STAGE>/<RESOURCE>';
+const API_GATEWAY_URL = process.env.REACT_APP_API_GATEWAY_URL as string;
 
 export default class ImageDisplay extends React.Component<{
     parameters: ImageParameters,

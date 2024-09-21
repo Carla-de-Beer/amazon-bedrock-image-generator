@@ -1,5 +1,5 @@
 # Amazon Bedrock Image Generator
-![badge](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/actions/workflows/test-build.yml/badge.svg?event=push)
+![badge](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/actions/workflows/e2e.yml/badge.svg?event=push)
 
 This project consists of a React application integrated with AWS to create and display generative AI images based on textual prompts. 
 Users can interact with the underlying Amazon Bedrock model through an AWS Lambda function, which, in turn, is accessed via the AWS API Gateway. 

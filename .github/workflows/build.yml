@@ -1,0 +1,57 @@
+name: 'Build and create deployment'
+
+on:
+  [ workflow_dispatch ]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: bedrock-image-generator-frontend
+
+jobs:
+  build:
+    name: Create AWS Elastic Beanstalk deployment artifact
+    runs-on: ubuntu-24.04
+
+    env:
+      API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+
+      - name: Build
+        run: |
+          set +x
+          sed -i 's|REACT_APP_API_GATEWAY_URL=API_GATEWAY_URL|REACT_APP_API_GATEWAY_URL=${{ env.API_GATEWAY_URL }}|' .env
+          set -x
+          npm run build
+          VERSION=$(awk -F\" '/"version"/ {print $4}' package.json)
+          DIRNAME=deployment
+          DEPLOYMENT_VERSION="$DIRNAME-$VERSION"
+          echo "DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION" >> $GITHUB_ENV
+          mkdir "$DIRNAME/"
+          cp -r build "$DIRNAME/"
+          cp package.json "$DIRNAME/"
+          cp server.js "$DIRNAME/"
+          cd "$DIRNAME"
+          sed -i 's/"start": "react-scripts --openssl-legacy-provider start"/"start": "node server.js"/' package.json
+          touch Procfile && echo "web: node server.js" > Procfile
+          zip -r "$DEPLOYMENT_VERSION".zip build/ server.js package.json Procfile
+          cd ..
+
+      - name: Store AWS Elastic Beanstalk deployment
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: eb-deployment
+          path: /home/runner/work/amazon-bedrock-image-generator/amazon-bedrock-image-generator/bedrock-image-generator-frontend/deployment
+          retention-days: 1

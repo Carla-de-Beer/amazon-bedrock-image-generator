@@ -1,4 +1,4 @@
-name: 'Build | Node.js'
+name: Run e2e tests
 
 on:
   push:
@@ -40,22 +40,3 @@ jobs:
         with:
           working-directory: bedrock-image-generator-frontend/cypress
           browser: chrome
-
-  build:
-    name: Build project
-    runs-on: ubuntu-24.04
-    needs: [ e2e ]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-
-      - name: Build
-        run: npm run build
-
