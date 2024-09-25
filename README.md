@@ -17,12 +17,11 @@ The application processes the requests and dynamically displays the generated im
 
 ## App architecture
 
-* The frontend interface is built with React, and calls the AWS API Gateway.
-
+* The application follows a standard event-driven architectural pattern.
+* The frontend interface is built with React, can de deployed onto AWS Elastic Beanstalk and calls the AWS API Gateway with a POST-request.
 * API Gateway forwards the body payload to a Lambda function via Lambda proxy integration.
   The Lambda function then invokes the foundation model inside Bedrock and saved the resulting image inside an S3
-  bucket,
-  before forwarding the presigned URL to API Gateway.
+  bucket, before forwarding the presigned URL to API Gateway.
 
 <br/><br/>
 
@@ -83,11 +82,17 @@ The IaC scripts automatically take care of the necessary CORS settings. They can
 ## [Frontend code](https://github.com/Carla-de-Beer/amazon-bedrock-image-generator/tree/main/bedrock-image-generator-frontend)
 
 The frontend consists of a simple React application that provides a GUI to allow for more convenient interaction with the Bedrock
-model. One or more images (up to a maximum of 3) can be created in either landscape or portrait mode, and made available
-for download in one of 3 file format options.
+model. One or more images (up to a maximum of 2) can be created in either landscape or portrait mode, and made available
+for download in one of 3 file format options (JPEG/PNG/TIFF).
+To run the UI and to be able to make calls to the backend, replace the `API_GATEWAY_URL` placeholder text with the URL associated with the POST-request of the `dev` stage of the API Gateway in the .env file
 
 ## RockArt UI
 
 The app was developed and tested exclusively in Google Chrome and is optimised for use on desktop devices with screens ~15" size.
 
 ![WordPainter UI](images/ui-image.png)
+
+## Frontend UI deployment to AWS Elastic Beanstalk
+* Create a secret in GitHub containing the URL associated with the POST-request of the `dev` stage of the API Gateway, called: `API_GATEWAY_URL`.
+* The project's GitHub pipeline allows for a manually triggerable `Build and create deployment` action that creates the archive file required for deployment. Tigger this workflow and download the artifact produced. This self-contained archive includes all the required deployment configuration data together with the project build.
+* Upload the archive file for deployment to AWS Elastic Beanstalk.
